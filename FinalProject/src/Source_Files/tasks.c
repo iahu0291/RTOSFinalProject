@@ -464,7 +464,6 @@ static void led0_ctrl_task(void *arg)
 {
     PP_UNUSED_PARAM(arg);
     RTOS_ERR err;
-    int flags = 0;
     while (1)
     {
         EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
@@ -478,7 +477,6 @@ static void led0_on_task(void *arg)
 {
     PP_UNUSED_PARAM(arg);
     RTOS_ERR err;
-    int flags = 0;
     while (1)
     {
         EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
@@ -492,7 +490,6 @@ static void led0_off_cb(OS_TMR *p_tmr, void *arg)
 {
     PP_UNUSED_PARAM(arg);
     RTOS_ERR err;
-    int flags = 0;
     while (1)
     {
         EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
@@ -509,7 +506,6 @@ static void led1_ctrl_task(void *arg)
 {
     PP_UNUSED_PARAM(arg);
     RTOS_ERR err;
-    int flags = 0;
     while (1)
     {
         EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
@@ -523,7 +519,6 @@ static void led1_on_task(void *arg)
 {
     PP_UNUSED_PARAM(arg);
     RTOS_ERR err;
-    int flags = 0;
     while (1)
     {
         EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
@@ -537,7 +532,6 @@ static void led1_off_cb(OS_TMR *p_tmr, void *arg)
 {
     PP_UNUSED_PARAM(arg);
     RTOS_ERR err;
-    int flags = 0;
     while (1)
     {
         EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
@@ -553,90 +547,53 @@ static void lcd_display_task(void *arg)
     PP_UNUSED_PARAM(arg);
     RTOS_ERR err;
 
-    OSTmrStart(&lcd_timer,&err);
     char displayStr1[10];
     while (1)
     {
-        int direction = 0;
-        currentLine = 0;
-        OSSemPend(&lcd_semaphore,
-                  0,
-                  OS_OPT_PEND_BLOCKING,
-                  (CPU_TS*) 0,
-                  &err);
 
-        // Access speed data
-        OSMutexPend(&speed_mutex,
-                    0,
-                    OS_OPT_PEND_BLOCKING,
-                    (CPU_TS*)0,
-                    &err);
-
-        sprintf(displayStr1, "%d", speed_data.currentSpeed);
-
-
-        OSMutexPost(&speed_mutex,
-                    OS_OPT_POST_NONE,
-                    &err);
-        // Speed data collected
-
-        // Access Direction data
-        OSMutexPend(&direction_mutex,
-                    0,
-                    OS_OPT_PEND_BLOCKING,
-                    (CPU_TS*)0,
-                    &err);
-
-        direction = direction_data.currentDirection;
-
-        OSMutexPost(&direction_mutex,
-                    OS_OPT_POST_NONE,
-                    &err);
-        //Direction data collected
-
-        GLIB_clear(&glib_context);
-        GLIB_setFont(&glib_context, (GLIB_Font_t *) &GLIB_FontNumber16x20);
-
-        GLIB_drawStringOnLine(&glib_context,
-                              displayStr1,
-                              currentLine++,
-                              GLIB_ALIGN_CENTER,
-                              0,
-                              5,
-                              true);
-        DMD_DisplayGeometry* geometry;
-        DMD_getDisplayGeometry(&geometry);
-        if(direction == 0){
-            // Draw arrow pointing straight. Line center: 64, 88
-            GLIB_drawLine(&glib_context, 64, 112, 64, 64);
-            GLIB_drawLine(&glib_context, 64, 64, 72, 72);
-            GLIB_drawLine(&glib_context, 64, 64, 56, 72);
-        }
-        else if(direction == 1){
-            // Draw arrow pointing slightly right
-            GLIB_drawLine(&glib_context, 81, 71, 47, 105);
-            GLIB_drawLine(&glib_context, 81, 71, 81, 82);
-            GLIB_drawLine(&glib_context, 81, 71, 70, 71);
-        }
-        else if(direction == 2){
-            // Draw arrow pointing very right
-            GLIB_drawPartialCircle(&glib_context, 64, 88, 24, 15);
-            GLIB_drawLine(&glib_context, 88, 88, 80, 80);
-            GLIB_drawLine(&glib_context, 88, 88, 96, 80);
-        }
-        else if(direction == -1){
-            // Draw arrow pointing slightly left
-            GLIB_drawLine(&glib_context, 47, 71, 81, 105);
-            GLIB_drawLine(&glib_context, 47, 71, 58, 71);
-            GLIB_drawLine(&glib_context, 47, 71, 47, 82);
-        }
-        else if(direction == -2){
-            // Draw arrow pointing very left
-            GLIB_drawPartialCircle(&glib_context, 64, 88, 24, 15);
-            GLIB_drawLine(&glib_context, 40, 88, 32, 80);
-            GLIB_drawLine(&glib_context, 40, 88, 48, 80);
-        }
-        DMD_updateDisplay();
+//        GLIB_clear(&glib_context);
+//        GLIB_setFont(&glib_context, (GLIB_Font_t *) &GLIB_FontNumber16x20);
+//
+//        GLIB_drawStringOnLine(&glib_context,
+//                              displayStr1,
+//                              currentLine++,
+//                              GLIB_ALIGN_CENTER,
+//                              0,
+//                              5,
+//                              true);
+//        DMD_DisplayGeometry* geometry;
+//        DMD_getDisplayGeometry(&geometry);
+//        if(direction == 0){
+//            // Draw arrow pointing straight. Line center: 64, 88
+//            GLIB_drawLine(&glib_context, 64, 112, 64, 64);
+//            GLIB_drawLine(&glib_context, 64, 64, 72, 72);
+//            GLIB_drawLine(&glib_context, 64, 64, 56, 72);
+//        }
+//        else if(direction == 1){
+//            // Draw arrow pointing slightly right
+//            GLIB_drawLine(&glib_context, 81, 71, 47, 105);
+//            GLIB_drawLine(&glib_context, 81, 71, 81, 82);
+//            GLIB_drawLine(&glib_context, 81, 71, 70, 71);
+//        }
+//        else if(direction == 2){
+//            // Draw arrow pointing very right
+//            GLIB_drawPartialCircle(&glib_context, 64, 88, 24, 15);
+//            GLIB_drawLine(&glib_context, 88, 88, 80, 80);
+//            GLIB_drawLine(&glib_context, 88, 88, 96, 80);
+//        }
+//        else if(direction == -1){
+//            // Draw arrow pointing slightly left
+//            GLIB_drawLine(&glib_context, 47, 71, 81, 105);
+//            GLIB_drawLine(&glib_context, 47, 71, 58, 71);
+//            GLIB_drawLine(&glib_context, 47, 71, 47, 82);
+//        }
+//        else if(direction == -2){
+//            // Draw arrow pointing very left
+//            GLIB_drawPartialCircle(&glib_context, 64, 88, 24, 15);
+//            GLIB_drawLine(&glib_context, 40, 88, 32, 80);
+//            GLIB_drawLine(&glib_context, 40, 88, 48, 80);
+//        }
+//        DMD_updateDisplay();
 
 
 
@@ -646,31 +603,6 @@ static void lcd_display_task(void *arg)
 
 
 }
-
-
-/*****************************************************************************
- * @brief
- *   LED driving function
- *
- * @details
- *   Drives the LEDs based on the capsense and pushbutton values.
- *
- ****************************************************************************/
-//void drive_leds(int status){
-//    if(status & (btn_msg_led0_on | slider_msg_led0_on)){
-//        GPIO_PinOutSet(LED0_port, LED0_pin);
-//    }
-//    else{
-//        GPIO_PinOutClear(LED0_port, LED0_pin);
-//    }
-//
-//    if(status & (btn_msg_led1_on | slider_msg_led1_on)){
-//        GPIO_PinOutSet(LED1_port, LED1_pin);
-//    }
-//    else{
-//        GPIO_PinOutClear(LED1_port, LED1_pin);
-//    }
-//}
 
 
 /***************************************************************************//**
@@ -701,23 +633,9 @@ static void idle_task(void *arg)
 void GPIO_EVEN_IRQHandler(void){
   RTOS_ERR err;
   GPIO_IntClear(1 << PSH0_pin);
-  if((!GPIO_PinInGet(PSH0_port, PSH0_pin)) && (GPIO_PinInGet(PSH1_port, PSH1_pin))){ //button 1 off & button 0 pressed
-      speedUpReady = 1;
-  }
-  else if(GPIO_PinInGet(PSH1_port, PSH1_pin) && GPIO_PinInGet(PSH0_port, PSH0_pin)){ //Released button 1 and button 0 is not pressed
-      if(speedUpReady){
-          if(push(fifo,button_0_cycle)){
-              OSSemPost(&button_semaphore,
-                        OS_OPT_POST_ALL,
-                        &err);
-          }
-          else{ EFM_ASSERT(0); } // Push to fifo failed
-      }
-  }
-  else{ // If this is hit, user is doing something funky with the buttons, make sure nothing goes off when it shouldn't
-      speedUpReady = 0;
-      speedDownReady = 0;
-  }
+//  if((!GPIO_PinInGet(PSH0_port, PSH0_pin)) && (GPIO_PinInGet(PSH1_port, PSH1_pin))){ //button 1 off & button 0 pressed
+//      speedUpReady = 1;
+//  }
 }
 
 /*****************************************************************************
@@ -731,24 +649,9 @@ void GPIO_EVEN_IRQHandler(void){
 void GPIO_ODD_IRQHandler(void){
   RTOS_ERR err;
   GPIO_IntClear(1 << PSH1_pin);
-  if((!GPIO_PinInGet(PSH1_port, PSH1_pin)) && (GPIO_PinInGet(PSH0_port, PSH0_pin))){ //button 1 pressed & button 0 off
-      speedDownReady = 1;
-  }
-  else if(GPIO_PinInGet(PSH1_port, PSH1_pin) && GPIO_PinInGet(PSH0_port, PSH0_pin)){ //Released button 1 and button 0 is not pressed
-      if(speedDownReady){
-          if(push(fifo,button_1_cycle)){
-              OSSemPost(&button_semaphore,
-                        OS_OPT_POST_ALL,
-                        &err);
-          }
-          else{ EFM_ASSERT(0); } // Push to fifo failed
-      }
-  }
-  else{ // If this is hit, user is doing something funky with the buttons, make sure nothing goes off when it shouldn't
-      speedUpReady = 0;
-      speedDownReady = 0;
-  }
-//  EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
+//  if((!GPIO_PinInGet(PSH1_port, PSH1_pin)) && (GPIO_PinInGet(PSH0_port, PSH0_pin))){ //button 1 pressed & button 0 off
+//      speedDownReady = 1;
+//  }
 }
 
 /*****************************************************************************
@@ -766,44 +669,5 @@ static void direction_timer_callback(OS_TMR *p_tmr, void *p_arg){
   OSSemPost(&slider_semaphore,
             OS_OPT_POST_ALL,
             &err);
-  EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
-}
-
-/*****************************************************************************
- * @brief
- *   Collision timer callback function
- *
- * @details
- *   Posts a flag to the vehicle monitor task when a collision warning timer runs out
- *
- ****************************************************************************/
-static void collision_timer_callback(OS_TMR *p_tmr, void *p_arg){
-  PP_UNUSED_PARAM(p_arg);
-  PP_UNUSED_PARAM(p_tmr);
-  RTOS_ERR err;
-  OSFlagPost(&monitor_flag_grp,
-             collision_timer_up,
-             OS_OPT_POST_FLAG_SET,
-             &err);
-  EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
-}
-
-
-
-/*****************************************************************************
- * @brief
- *   LCD timer callback function
- *
- * @details
- *   Calls the LCD display function when the timer runs out
- *
- ****************************************************************************/
-static void lcd_timer_callback(OS_TMR *p_tmr, void *p_arg){
-  PP_UNUSED_PARAM(p_arg);
-  PP_UNUSED_PARAM(p_tmr);
-  RTOS_ERR err;
-  OSSemPost(&lcd_semaphore,
-             OS_OPT_POST_ALL,
-             &err);
   EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
 }
