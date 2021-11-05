@@ -372,98 +372,27 @@ void tasks_init(void)
 }
 
 /***************************************************************************//**
- * Button input task.
+ * Thrust input task.
  ******************************************************************************/
-static void speed_set_task(void *arg)
+static void thrust_input_task(void *arg)
 {
     PP_UNUSED_PARAM(arg);
-
     RTOS_ERR err;
 
-    OSMutexPend(&speed_mutex,
-                0,
-                OS_OPT_PEND_BLOCKING,
-                (CPU_TS*)0,
-                &err);
 
-    speed_data.currentSpeed = 0;
-    speed_data.numDecreases = 0;
-    speed_data.numIncreases = 0;
-    OSMutexPost(&speed_mutex,
-                OS_OPT_POST_NO_SCHED,
-                &err);
+
     EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
 
     while (1)
     {
-        OSSemPend(&button_semaphore,
-                  0,
-                  OS_OPT_PEND_BLOCKING,
-                  (CPU_TS*)0,
-                  &err);
-        EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
-        int buttonMsg = 0;
-        OSMutexPend(&speed_mutex,
-                    0,
-                    OS_OPT_PEND_BLOCKING,
-                    (CPU_TS*)0,
-                    &err);
-        //FIFO CRITICAL SECTION
-        CORE_DECLARE_IRQ_STATE;
-        CORE_ENTER_CRITICAL();
-        while(!is_empty(fifo)){
-            buttonMsg = pop(fifo);
-            if(buttonMsg == button_0_cycle){
-                speed_data.currentSpeed += 5;
-                speed_data.numIncreases++;
-            }
-            if(buttonMsg == button_1_cycle){
-                speed_data.currentSpeed += -5;
-                speed_data.numDecreases++;
-            }
-        }
-        //END FIFO CRITICAL SECTION
-        CORE_EXIT_CRITICAL();
-        OSMutexPost(&speed_mutex,
-                    OS_OPT_POST_NONE,
-                    &err);
-        OSFlagPost(&monitor_flag_grp,
-                   speed_changed,
-                   OS_OPT_POST_FLAG_SET,
-                   &err);
+
     }
 }
-
-/*****************************************************************************
- * @brief
- *   Pushbutton1 polling function
- *
- * @details
- *   Polls pushbutton 1 and assigns pushButton1 true if the button is pressed
- *   and false if it's not.
- *
- ****************************************************************************/
-//void pushbutton0_poll(void){
-//  pushButton0 = (!GPIO_PinInGet(PSH0_port, PSH0_pin));
-//}
-
-/*****************************************************************************
- * @brief
- *   Pushbutton1 polling function
- *
- * @details
- *   Polls pushbutton 1 and assigns pushButton1 true if the button is pressed
- *   and false if it's not.
- *
- ****************************************************************************/
-//void pushbutton1_poll(void){
-//  pushButton1 = (!GPIO_PinInGet(PSH1_port, PSH1_pin));
-//}
 
 /***************************************************************************//**
  * Capsense input task.
  ******************************************************************************/
-static void direction_set_task(void *arg)
+static void direction_input_task(void *arg)
 {
     PP_UNUSED_PARAM(arg);
     RTOS_ERR err;
@@ -472,62 +401,9 @@ static void direction_set_task(void *arg)
     CAPSENSE_Init();
 
     EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
-    int prevDirection = 0;
     while (1)
     {
-        int flagOut = 0;
-        CPU_TS* sliderTimeStamp;
-        OSSemPend(&slider_semaphore,
-                  0,
-                  OS_OPT_PEND_BLOCKING,
-                  (CPU_TS*)0,
-                  &err);
-        capsense_poll();
-        if(capsenseMeasurement != prevDirection){
-            OSMutexPend(&direction_mutex,
-                        0,
-                        OS_OPT_PEND_BLOCKING,
-                        (CPU_TS*)0,
-                        &err);
-            EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
 
-            direction_data.currentDirection = capsenseMeasurement;
-            direction_data.lastChangeTimestamp = (int) *sliderTimeStamp;
-            if(capsenseMeasurement <= 0 && prevDirection > 0){
-                direction_data.numRightTurns++;
-            }
-            else if (capsenseMeasurement >= 0 && prevDirection < 0){
-                direction_data.numLeftTurns++;
-            }
-            if(capsenseMeasurement != 0 &&
-                !(prevDirection > 0 && capsenseMeasurement > 0) &&
-                !(prevDirection < 0 && capsenseMeasurement < 0)){
-                OSTmrStart(&collision_timer,
-                           &err);
-                flagOut = collision_timer_reset;
-            }
-            else if (capsenseMeasurement == 0){
-                OSTmrStop(&collision_timer,
-                          OS_OPT_TMR_NONE,
-                          0,
-                          &err); // This throws an error in &err, but it works, so I'm leaving it
-                flagOut = collision_timer_reset;
-            }
-//            EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
-            prevDirection = capsenseMeasurement;
-
-            OSMutexPost(&direction_mutex,
-                        OS_OPT_POST_NONE,
-                        &err);
-            EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
-
-            OSFlagPost(&monitor_flag_grp,
-                       flagOut + direction_changed,
-                       OS_OPT_POST_FLAG_SET,
-                       &err);
-            EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
-
-        }
     }
 }
 
@@ -566,64 +442,16 @@ void capsense_poll(void){
 }
 
 /*************************************************
- * Vehicle monitor task.
- *
+ * Physics task.
  *************************************************/
-static void vehicle_monitor_task(void *arg)
+static void physics_task(void *arg)
 {
   PP_UNUSED_PARAM(arg);
   RTOS_ERR err;
 
   while (1)
   {
-      int status = OSFlagPend(&monitor_flag_grp,
-                              speed_changed | direction_changed | collision_timer_up | collision_timer_reset,
-                              0,
-                              OS_OPT_PEND_FLAG_SET_ANY + OS_OPT_PEND_FLAG_CONSUME + OS_OPT_PEND_BLOCKING,
-                              (CPU_TS*)0,
-                              &err);
-      int flagOut = 0;
-      OSMutexPend(&speed_mutex,
-                  0,
-                  OS_OPT_PEND_BLOCKING,
-                  (CPU_TS*)0,
-                  &err);
-      OSMutexPend(&direction_mutex,
-                  0,
-                  OS_OPT_PEND_BLOCKING,
-                  (CPU_TS*)0,
-                  &err);
-      if(speed_data.currentSpeed > 75){
-          flagOut += led0on;
-      }
-      else if ((speed_data.currentSpeed > 45) && (direction_data.currentDirection != 0)){
-          flagOut += led0on;
-      }
-      else{
-          flagOut += led0off;
-      }
 
-      if(status & collision_timer_up){
-          flagOut += led1on;
-      }
-      else if (status & collision_timer_reset){
-          flagOut += led1off;
-      }
-
-      OSMutexPost(&direction_mutex,
-                  OS_OPT_POST_NONE,
-                  &err);
-
-
-      OSMutexPost(&speed_mutex,
-                  OS_OPT_POST_NONE,
-                  &err);
-
-
-      OSFlagPost(&alert_flag_grp,
-                 flagOut,
-                 OS_OPT_POST_FLAG_SET,
-                 &err);
   }
 }
 
