@@ -43,10 +43,9 @@ static CPU_STK  thrust_input_stack[THRUST_INPUT_TASK_STACK_SIZE],
                 lcd_display_stack[LCD_DISPLAY_TASK_STACK_SIZE],
                 physics_stack[PHYSICS_TASK_STACK_SIZE];
 
-static OS_FLAG_GRP monitor_flag_grp, alert_flag_grp;
-static OS_Q led_message_queue;
+//static OS_Q led_message_queue;
 static OS_SEM button_semaphore, slider_semaphore, lcd_semaphore;
-static OS_TMR direction_timer, collision_timer, lcd_timer;
+static OS_TMR direction_timer;
 
 static OS_MUTEX speed_mutex;
 static OS_MUTEX direction_mutex;
@@ -54,30 +53,10 @@ static OS_MUTEX direction_mutex;
 static GLIB_Context_t glib_context;
 static int currentLine = 0;
 
-static struct speed_struct speed_data;
-static struct direction_struct direction_data;
-static struct fifo_t* fifo;
-uint8_t speedUpReady, speedDownReady;
+//static struct speed_struct speed_data;
+//static struct direction_struct direction_data;
 int capsenseMeasurement;
 
-enum button_flag_enum{
-  button_0_cycle = 1,
-  button_1_cycle = 2,
-};
-
-enum monitor_flag_enum{
-  speed_changed = 1,
-  direction_changed = 2,
-  collision_timer_up = 4,
-  collision_timer_reset = 8,
-};
-
-enum led_alert_flag_enum{
-  led0on = 1,
-  led1on = 2,
-  led0off = 4,
-  led1off = 8
-};
 /*******************************************************************************
  *********************   LOCAL FUNCTION PROTOTYPES   ***************************
  ******************************************************************************/
@@ -85,7 +64,6 @@ enum led_alert_flag_enum{
 static void thrust_input_task(void *arg);
 static void direction_input_task(void *arg);
 static void direction_timer_callback(OS_TMR *p_tmr, void *p_arg);
-static void collision_timer_callback(OS_TMR *p_tmr, void *p_arg);
 static void led0_ctrl_task(void *arg);
 static void led1_ctrl_task(void *arg);
 static void led0_on_task(void *arg);
@@ -131,27 +109,14 @@ void tasks_init(void)
   DMD_updateDisplay();
 
   RTOS_ERR err;
-  // Create monitor flag group
-  OSFlagCreate(&monitor_flag_grp,
-               "Monitor Flag Group",
-               0,
-               &err);
-  EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
 
-
-  // Create alert flag group
-  OSFlagCreate(&alert_flag_grp,
-               "Alert Flag Group",
-               0,
-               &err);
-  EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
 
   // Create LED output message queue
-  OSQCreate(&led_message_queue,
-            "LED Message Queue",
-            2,
-            &err);
-  EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
+//  OSQCreate(&led_message_queue,
+//            "LED Message Queue",
+//            2,
+//            &err);
+//  EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
 
   // Create button semaphore
   OSSemCreate(&button_semaphore,
@@ -198,18 +163,15 @@ void tasks_init(void)
 //  EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
 
   // Create collision detection timer
-  OSTmrCreate(&collision_timer,
-              "Collision Warning Timer",
-              50,
-              0,
-              OS_OPT_TMR_ONE_SHOT,
-              (OS_TMR_CALLBACK_PTR) collision_timer_callback,
-              (void*)0,
-              &err);
-  EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
-
-  // Create FIFO for button transitions
-  fifo = create_fifo(16);
+//  OSTmrCreate(&collision_timer,
+//              "Collision Warning Timer",
+//              50,
+//              0,
+//              OS_OPT_TMR_ONE_SHOT,
+//              (OS_TMR_CALLBACK_PTR) collision_timer_callback,
+//              (void*)0,
+//              &err);
+//  EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
 
 
   //Create speed mutex
