@@ -22,7 +22,6 @@
 #include "capsense.h"
 #include "em_emu.h"
 #include "structs.h"
-#include "fifo.h"
 #include "glib.h"
 #include "dmd.h"
 #include "sl_board_control.h"
