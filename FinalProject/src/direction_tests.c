@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include "ctest.h"
-#include "priority.h"
+#include ".h"
 
 CTEST_DATA(priority) {
     struct task_t task[3];
