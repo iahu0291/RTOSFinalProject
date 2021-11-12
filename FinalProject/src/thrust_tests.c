@@ -4,10 +4,11 @@
 
 CTEST_DATA(thrust) {
     struct craft_thrust_struct *craft_thrust_data;
-    int thrustToSet = 0;
+    int thrustToSet;
 };
 
 CTEST_SETUP(thrust) {
+    thrustToSet = 0;
 }
 
 CTEST2(thrust, max_thrust_test) {
