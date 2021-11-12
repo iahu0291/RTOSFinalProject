@@ -8,6 +8,25 @@
 #ifndef SRC_HEADER_FILES_STRUCTS_H_
 #define SRC_HEADER_FILES_STRUCTS_H_
 
+// Game Info struct
+struct game_settings_struct{
+  int version;
+  int gravity;
+  int vehicleMass;
+  int xMin, xMax, yMin, yMax;
+  int optionSelected;
+  int maxThrust;
+  int initialFuelMass;
+  int conversionEfficiency;
+  int fuelEnergyDensity;
+  int maxVLandingSpeed, maxHLandingSpeed; 
+  int blackoutAccel, blackoutDuration;
+  int initXVel, initYVel;
+  int initHPos;
+  int rotationQuanta, rotationSpeedQuanta;
+};
+
+
 // Thrust data structs
 enum thrust_possibilities{
   thrust_none = 0,
@@ -40,6 +59,12 @@ struct craft_direction_struct{
 
 struct craft_position_struct{
   int current_x_position, current_y_position;
+};
+
+// LED Control Structs
+struct led_control_struct{
+  int totalPeriod; // In ms
+  int dutyCycle; // From 0-10 
 };
 
 
