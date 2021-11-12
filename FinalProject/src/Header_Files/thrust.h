@@ -8,7 +8,7 @@
 #ifndef SRC_HEADER_FILES_THRUST_H_
 #define SRC_HEADER_FILES_THRUST_H_
 
-
+#include "structs.h"
 
 // Function Prototypes
 
