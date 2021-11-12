@@ -63,8 +63,8 @@ struct craft_position_struct{
 
 // LED Control Structs
 struct led_control_struct{
-  int totalPeriod; // In ms
-  int dutyCycle; // From 0-10 
+  int restartPeriod; // In ms
+  int timeFromOnToOff; // In ms 
 };
 
 
