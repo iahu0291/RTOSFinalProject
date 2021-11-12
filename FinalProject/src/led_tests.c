@@ -1,92 +1,53 @@
 #include <stdlib.h>
 #include "ctest.h"
-#include ".h"
+#include "ledfunc.h"
 
-CTEST_DATA(priority) {
-    struct task_t task[3];
-    int size;
+CTEST_DATA(led_tests) {
+    struct led_control_struct *led_ctrl;
+    int period, duty_cycle;
 };
 
-CTEST_SETUP(priority) {
-    int execution[] = {1, 2, 3};
-    int priority[] = {1, 2, 3};
-    data->size = sizeof(execution) / sizeof(execution[0]);
-    init(data->task, execution, priority, data->size);
-    priority_schedule(data->task, data->size);
+CTEST_SETUP(led_tests) {
 }
 
-CTEST2(priority, test_process) {
-    for (int i = 0; i < data->size; i++) {
-        ASSERT_EQUAL(i, (int)data->task[i].process_id);
-    }
+CTEST2(led_tests, verify_period_1) {
+    data->period = 10;
+    data->duty_cycle = 8;
+    update_led_control_struct(data->led_ctrl, data->period, data->duty_cycle);
+    ASSERT_EQUAL(10, data->led_ctrl->restartPeriod); //Verify correct restart period
 }
 
-CTEST2(priority, avg_wait_time_1) {
-    ASSERT_EQUAL((1+2+4)/3, calculate_average_wait_time(data->task, data->size));
+CTEST2(led_tests, verify_high_duty_cycle) {    
+    data->period = 10;
+    data->duty_cycle = 8;
+    update_led_control_struct(data->led_ctrl, data->period, data->duty_cycle);
+    ASSERT_EQUAL(8, data->led_ctrl->timeFromOnToOff); //Verify correct restart period
 }
 
-CTEST2(priority, avg_turnaround_time_1) {
-    ASSERT_EQUAL((2+5+6)/3, calculate_average_turn_around_time(data->task, data->size));
+CTEST2(led_tests, verify_period_2) {
+    data->period = 20;
+    data->duty_cycle = 8;
+    update_led_control_struct(data->led_ctrl, data->period, data->duty_cycle);
+    ASSERT_EQUAL(20, data->led_ctrl->restartPeriod); //Verify correct restart period
 }
 
-CTEST_DATA(priority2) {
-    struct task_t task[5];
-    int size;
-};
-
-CTEST_SETUP(priority2) {
-    int execution[] = {3, 3, 3, 3, 3};
-    int priority[] = {1, 2, 3, 4, 5};
-    data->size = sizeof(execution) / sizeof(execution[0]);
-    init(data->task, execution, priority, data->size);
-    priority_schedule(data->task, data->size);
+CTEST2(led_tests, verify_high_duty_cycle_2) {
+    data->period = 20;
+    data->duty_cycle = 8;
+    update_led_control_struct(data->led_ctrl, data->period, data->duty_cycle);
+    ASSERT_EQUAL(16, data->led_ctrl->timeFromOnToOff); //Verify correct restart period
 }
 
-CTEST2(priority2, setup_2) {
-    for (int i = 0; i < data->size; i++) {
-        ASSERT_EQUAL(i, (int)data->task[i].process_id);
-    }
+CTEST2(led_tests, verify_low_duty_cycle) {
+    data->period = 10;
+    data->duty_cycle = 2;
+    update_led_control_struct(data->led_ctrl, data->period, data->duty_cycle);
+    ASSERT_EQUAL(2, data->led_ctrl->timeFromOnToOff); //Verify correct restart period
 }
 
-CTEST2(priority2, avg_wait_time_2) {
-    ASSERT_EQUAL((0+3+6+9+12)/5, calculate_average_wait_time(data->task, data->size));
+CTEST2(led_tests, verify_low_duty_cycle_2) {
+    data->period = 20;
+    data->duty_cycle = 2;
+    update_led_control_struct(data->led_ctrl, data->period, data->duty_cycle);
+    ASSERT_EQUAL(4, data->led_ctrl->timeFromOnToOff); //Verify correct restart period
 }
-
-CTEST2(priority2, avg_turnaround_time_2) {
-    ASSERT_EQUAL((3+6+9+12+15)/5, calculate_average_turn_around_time(data->task, data->size));
-}
-
-CTEST_DATA(priority3) {
-    struct task_t task[3];
-    int size;
-};
-
-CTEST_SETUP(priority3) {
-    int execution[] = {6, 8, 5};
-    int priority[] = {5, 4, 3};
-    data->size = sizeof(execution) / sizeof(execution[0]);
-    init(data->task, execution, priority, data->size);
-    priority_schedule(data->task, data->size);
-}
-//I: 0  0  0  0  0  2  0  2  1  1  1  1  1  1  1  1  2  2  2
-//P0:5  5  5  10 10 10 40 40 40 40 40 40 40 40 40 40 40 40 40
-//P1:4  4  4  4  4  4  4  4  36 36 36 36 36 36 36 36 36 36 36
-//P2:3  3  3  3  3  24 24 24 24 24 24 24 24 24 24 24 24 24 24
-//R0:5  4  3  2  1  1  0  
-//R1:8  8  8  8  8  8  8  8  7  6  5  4  3  2  1  0  
-//R2:5  5  5  5  5  4  4  3  3  3  3  3  3  3  3  3  2  1  0
-//T: 1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19
-CTEST2(priority3, setup_3) {
-    for (int i = 0; i < data->size; i++) {
-        ASSERT_EQUAL(i, (int)data->task[i].process_id);
-    }
-}
-
-CTEST2(priority3, avg_wait_time_3) {
-    ASSERT_EQUAL((1 + 8 + 13)/3, calculate_average_wait_time(data->task, data->size));
-}
-
-CTEST2(priority3, avg_turnaround_time_3) {
-    ASSERT_EQUAL((7+16+19)/3, calculate_average_turn_around_time(data->task, data->size));
-}
-// TODO add additional tests to help debug
