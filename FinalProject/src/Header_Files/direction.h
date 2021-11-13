@@ -10,6 +10,6 @@
 
 #include "structs.h"
 
-void update_thrust_data(struct craft_thrust_struct* craft_direction_data, int new_direction);
+void update_thrust_data(struct craft_direction_struct* craft_direction_data, int new_direction);
 
 #endif /* SRC_HEADER_FILES_DIRECTION_H_ */

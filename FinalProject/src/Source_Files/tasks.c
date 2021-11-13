@@ -56,6 +56,7 @@ static GLIB_Context_t glib_context;
 static int currentLine = 0;
 
 static struct craft_thrust_struct thrust_data;
+static struct craft_direction_struct direction_data;
 //static struct speed_struct speed_data;
 //static struct direction_struct direction_data;
 int capsenseMeasurement;
@@ -378,9 +379,30 @@ static void direction_input_task(void *arg)
     CAPSENSE_Init();
 
     EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
+    int prevCapsenseMeas;
     while (1)
     {
-
+//        OSSemPend(); // Pend on direction timer callback semaphore
+        if(prevCapsenseMeas != capsenseMeasurement){ // We need to update directiondata
+//            OSMutexPend(); // Wait for direction data mutex lock
+            if(capsenseMeasurement == -2){
+                update_direction_data(&direction_data, hard_ccw);
+            }
+            else if(capsenseMeasurement == -1){
+                update_direction_data(&direction_data, soft_ccw);
+            }
+            else if(capsenseMeasurement == 0){
+                update_direction_data(&direction_data, no_rot);
+            }
+            else if(capsenseMeasurement == 1){
+                update_direction_data(&direction_data, soft_cw);
+            }
+            else {
+                update_direction_data(&direction_data, hard_cw);
+            }
+//            OSMutexPost(); // Release direction data mutex lock
+        }
+        prevCapsenseMeas = capsenseMeasurement;
     }
 }
 
