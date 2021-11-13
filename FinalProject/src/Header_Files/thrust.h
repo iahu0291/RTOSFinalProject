@@ -12,6 +12,6 @@
 
 // Function Prototypes
 
-void update_thrust_data(struct craft_thrust_struct* craft_thrust_data, int new_thrust);
+void update_thrust_data(struct craft_thrust_struct *thrust_data, int new_thrust);
 
 #endif /* SRC_HEADER_FILES_THRUST_H_ */

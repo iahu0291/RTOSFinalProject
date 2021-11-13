@@ -25,6 +25,9 @@
 #include "glib.h"
 #include "dmd.h"
 #include "sl_board_control.h"
+#include "thrust.h"
+#include "direction.h"
+#include "physics.h"
 
 /*******************************************************************************
  ***************************  LOCAL VARIABLES   ********************************
@@ -52,6 +55,7 @@ static OS_MUTEX direction_mutex;
 static GLIB_Context_t glib_context;
 static int currentLine = 0;
 
+static struct craft_thrust_struct thrust_data;
 //static struct speed_struct speed_data;
 //static struct direction_struct direction_data;
 int capsenseMeasurement;
@@ -346,6 +350,18 @@ static void thrust_input_task(void *arg)
 
     while (1)
     {
+//        OSSemPend(); //Pend waiting for button input change semaphore
+//        OSMutexPend(); //Pend waiting for thrust struct mutex access
+        if(!GPIO_PinInGet(PSH1_port, PSH1_pin)){ //Button 1 pressed, max thrust
+            update_thrust(&thrust_data, thrust_max);
+        }
+        else if(!GPIO_PinInGet(PSH0_port, PSH0_pin)){ // Button 0 pressed, min thrust
+            update_thrust(&thrust_data, thrust_min);
+        }
+        else{
+            update_thrust(&thrust_data, thrust_none);
+        }
+//        OSMutexPost(); //Release thrust struct mutex lock
 
     }
 }
