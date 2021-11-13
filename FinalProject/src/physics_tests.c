@@ -1,92 +1,93 @@
 #include <stdlib.h>
 #include "ctest.h"
-#include ".h"
+#include "physics.h"
 
-CTEST_DATA(priority) {
-    struct task_t task[3];
-    int size;
+CTEST_DATA(physics) {
+    struct craft_thrust_struct *thrust_data;
+    struct craft_direction_struct *direction_data;
+    struct craft_position_struct *position_data;
+    struct game_settings_struct *settings;
 };
 
-CTEST_SETUP(priority) {
-    int execution[] = {1, 2, 3};
-    int priority[] = {1, 2, 3};
-    data->size = sizeof(execution) / sizeof(execution[0]);
-    init(data->task, execution, priority, data->size);
-    priority_schedule(data->task, data->size);
+CTEST_SETUP(physics) {
+    data->thrust_data->current_thrust = thrust_none;
+    data->direction_data->current_direction = 0;
+    data->direction_data->current_ang_momentum = 0;
+    data->position_data->current_x_position = data->settings->xMax/2;
+    data->position_data->current_y_position = data->settings->yMax;
+    data->position_data->current_x_vel = 0; 
+    data->position_data->current_y_vel = 0;
+    data->settings->gravity = 10;
+    data->settings->yMin = 0;
+    data->settings->yMax = 512;
+    data->settings->xMin = 0;
+    data->settings->xMax = 512;
 }
 
-CTEST2(priority, test_process) {
-    for (int i = 0; i < data->size; i++) {
-        ASSERT_EQUAL(i, (int)data->task[i].process_id);
-    }
+CTEST2(physics, verify_falling) {
+    tick_update_position(data->thrust_data, data->direction_data, data->position_data, data->settings);
+    ASSERT_EQUAL(-10, data->position_data->current_y_vel);
+    ASSERT_EQUAL(data->settings->yMax-10, data->position_data->current_y_position);
 }
 
-CTEST2(priority, avg_wait_time_1) {
-    ASSERT_EQUAL((1+2+4)/3, calculate_average_wait_time(data->task, data->size));
+CTEST2(physics, verify_no_burn) {
+    int before_burn = data->thrust_data->current_fuel;
+    tick_burn_fuel(data->thrust_data, data->direction_data, data->settings);
+    ASSERT_EQUAL(before_burn, data->thrust_data->current_fuel);
 }
 
-CTEST2(priority, avg_turnaround_time_1) {
-    ASSERT_EQUAL((2+5+6)/3, calculate_average_turn_around_time(data->task, data->size));
+CTEST2(physics, verify_falling_2) {
+    tick_update_position(data->thrust_data, data->direction_data, data->position_data, data->settings);
+    ASSERT_EQUAL(-20, data->position_data->current_y_vel);
+    ASSERT_EQUAL(data->settings->yMax-30, data->position_data->current_y_position);
 }
 
-CTEST_DATA(priority2) {
-    struct task_t task[5];
-    int size;
-};
-
-CTEST_SETUP(priority2) {
-    int execution[] = {3, 3, 3, 3, 3};
-    int priority[] = {1, 2, 3, 4, 5};
-    data->size = sizeof(execution) / sizeof(execution[0]);
-    init(data->task, execution, priority, data->size);
-    priority_schedule(data->task, data->size);
+CTEST2(physics, verify_falling_3) {
+    tick_update_position(data->thrust_data, data->direction_data, data->position_data, data->settings);
+    ASSERT_EQUAL(-30, data->position_data->current_y_vel);
+    ASSERT_EQUAL(data->settings->yMax-60, data->position_data->current_y_position);
 }
 
-CTEST2(priority2, setup_2) {
-    for (int i = 0; i < data->size; i++) {
-        ASSERT_EQUAL(i, (int)data->task[i].process_id);
-    }
+CTEST2(physics, verify_min_thrust_no_dir) {
+    //Reset Position & Velocity
+    data->position_data->current_x_position = data->settings->xMax/2;
+    data->position_data->current_y_position = data->settings->yMax/2;
+    data->position_data->current_x_vel = 0; 
+    data->position_data->current_y_vel = 0;
+    data->thrust_data->current_thrust = thrust_min;
+    tick_update_position(data->thrust_data, data->direction_data, data->position_data, data->settings);
+    int thrust_vel_expected = sqrt(2 * (10 * data->settings->fuelEnergyDensity) / (data->thrust_data->current_fuel + data->settings->vehicleMass));
+    ASSERT_EQUAL(thrust_vel_expected - data->settings->gravity, data->position_data->current_y_vel);
+    ASSERT_EQUAL((data->settings->yMax/2) - (thrust_vel_expected - data->settings->gravity), data->position_data->current_y_position);
 }
 
-CTEST2(priority2, avg_wait_time_2) {
-    ASSERT_EQUAL((0+3+6+9+12)/5, calculate_average_wait_time(data->task, data->size));
+CTEST2(physics, check_flying) {
+    int status = check_landing(data->position_data, data->settings);
+    ASSERT_EQUAL(0, status);
 }
 
-CTEST2(priority2, avg_turnaround_time_2) {
-    ASSERT_EQUAL((3+6+9+12+15)/5, calculate_average_turn_around_time(data->task, data->size));
+
+CTEST2(physics, verify_min_burn) {
+    int before_burn = data->thrust_data->current_fuel;
+    tick_burn_fuel(data->thrust_data, data->direction_data, data->settings);
+    ASSERT_EQUAL(before_burn - 10, data->thrust_data->current_fuel);
 }
 
-CTEST_DATA(priority3) {
-    struct task_t task[3];
-    int size;
-};
-
-CTEST_SETUP(priority3) {
-    int execution[] = {6, 8, 5};
-    int priority[] = {5, 4, 3};
-    data->size = sizeof(execution) / sizeof(execution[0]);
-    init(data->task, execution, priority, data->size);
-    priority_schedule(data->task, data->size);
-}
-//I: 0  0  0  0  0  2  0  2  1  1  1  1  1  1  1  1  2  2  2
-//P0:5  5  5  10 10 10 40 40 40 40 40 40 40 40 40 40 40 40 40
-//P1:4  4  4  4  4  4  4  4  36 36 36 36 36 36 36 36 36 36 36
-//P2:3  3  3  3  3  24 24 24 24 24 24 24 24 24 24 24 24 24 24
-//R0:5  4  3  2  1  1  0  
-//R1:8  8  8  8  8  8  8  8  7  6  5  4  3  2  1  0  
-//R2:5  5  5  5  5  4  4  3  3  3  3  3  3  3  3  3  2  1  0
-//T: 1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19
-CTEST2(priority3, setup_3) {
-    for (int i = 0; i < data->size; i++) {
-        ASSERT_EQUAL(i, (int)data->task[i].process_id);
-    }
+CTEST2(physics, verify_max_thrust_no_dir) {
+    //Reset Position & Velocity
+    data->position_data->current_x_position = data->settings->xMax/2;
+    data->position_data->current_y_position = data->settings->yMax/2;
+    data->position_data->current_x_vel = 0; 
+    data->position_data->current_y_vel = 0;
+    data->thrust_data->current_thrust = thrust_min;
+    tick_update_position(data->thrust_data, data->direction_data, data->position_data, data->settings);
+    int thrust_vel_expected = sqrt(2 * (30 * data->settings->fuelEnergyDensity) / (data->thrust_data->current_fuel + data->settings->vehicleMass));
+    ASSERT_EQUAL(thrust_vel_expected - data->settings->gravity, data->position_data->current_y_vel);
+    ASSERT_EQUAL((data->settings->yMax/2) - (thrust_vel_expected - data->settings->gravity), data->position_data->current_y_position);
 }
 
-CTEST2(priority3, avg_wait_time_3) {
-    ASSERT_EQUAL((1 + 8 + 13)/3, calculate_average_wait_time(data->task, data->size));
+CTEST2(physics, verify_max_burn) {
+    int before_burn = data->thrust_data->current_fuel;
+    tick_burn_fuel(data->thrust_data, data->direction_data, data->settings);
+    ASSERT_EQUAL(before_burn - 30, data->thrust_data->current_fuel);
 }
-
-CTEST2(priority3, avg_turnaround_time_3) {
-    ASSERT_EQUAL((7+16+19)/3, calculate_average_turn_around_time(data->task, data->size));
-}
-// TODO add additional tests to help debug

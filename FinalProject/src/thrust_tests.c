@@ -8,7 +8,6 @@ CTEST_DATA(thrust) {
 };
 
 CTEST_SETUP(thrust) {
-    thrustToSet = 0;
 }
 
 CTEST2(thrust, max_thrust_test) {
