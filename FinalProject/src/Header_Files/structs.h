@@ -8,7 +8,7 @@
 #ifndef SRC_HEADER_FILES_STRUCTS_H_
 #define SRC_HEADER_FILES_STRUCTS_H_
 
-// Game Info struct
+// Game Info structs
 struct game_settings_struct{
   int version;
   int gravity; // Virtual pixels/tick^2
@@ -23,6 +23,12 @@ struct game_settings_struct{
   int initXVel, initYVel;
   int initHPos;
   int rotationQuanta, rotationSpeedQuanta;
+};
+
+enum game_states{
+  game_ship_flying = 0,
+  game_ship_crashed = 1,
+  game_ship_landed = 2
 };
 
 
