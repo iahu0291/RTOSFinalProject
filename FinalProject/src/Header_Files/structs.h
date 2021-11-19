@@ -74,18 +74,4 @@ struct led_control_struct{
 };
 
 
-struct speed_struct{
-  int currentSpeed;
-  int numIncreases;
-  int numDecreases;
-};
-
-struct direction_struct{
-  int currentDirection;
-  int numLeftTurns;
-  int numRightTurns;
-  int lastChangeTimestamp;
-};
-
-
 #endif /* SRC_HEADER_FILES_STRUCTS_H_ */
