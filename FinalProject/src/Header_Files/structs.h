@@ -10,19 +10,27 @@
 
 // Game Info structs
 struct game_settings_struct{
-  int version;
+  int version = 2;
   int gravity; // Virtual pixels/tick^2
   int vehicleMass;
   int xMin, xMax, yMin, yMax; //Total virtual pixels on screen
   int optionSelected;
+  int maxThrust;
   int initialFuelMass;
   int conversionEfficiency;
-  int fuelEnergyDensity;
   int maxVLandingSpeed, maxHLandingSpeed; 
   int blackoutAccel, blackoutDuration;
   int initXVel, initYVel;
   int initHPos;
-  int rotationQuanta, rotationSpeedQuanta;
+  int rotationSpeedQuantaMin, rotationSpeedQuantaMax;
+};
+
+enum game_options{
+  slider_angle__buttons_burn_rate = 0,
+  slider_angle__buttons_burst = 1,
+  slider_rotational_rate__buttons_burst = 2,
+  slider_burn_rate__buttons_angle_inc = 3,
+  slider_burn_rate__buttons_rotational_rate = 4
 };
 
 enum game_states{
@@ -56,7 +64,7 @@ enum rotational_thrust_options{
 
 struct craft_direction_struct{
   int current_direction; // Current angle in degrees, 0 being straight up
-  int current_ang_momentum; //How fast the ship is currently spinning, positive is CW and negative is CCW
+  int current_rotation_rate; //How fast the ship is currently spinning, positive is CW and negative is CCW
   int rotational_thrust; //Which rotational direction and how hard are we adjusting spin
 };
 
@@ -65,6 +73,10 @@ struct craft_direction_struct{
 struct craft_position_struct{
   int current_x_position, current_y_position;
   int current_x_vel, current_y_vel;
+};
+
+struct x_y_struct{
+  int x, y;
 };
 
 // LED Control Structs
