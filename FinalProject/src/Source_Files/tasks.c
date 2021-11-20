@@ -48,6 +48,8 @@ static CPU_STK  thrust_input_stack[THRUST_INPUT_TASK_STACK_SIZE],
 //static OS_Q led_message_queue;
 static OS_SEM button_semaphore, slider_semaphore, lcd_semaphore;
 static OS_TMR direction_timer;
+static OS_TMR led0_on_timer, led0_off_timer;
+static OS_TMR led1_on_timer, led1_off_timer;
 
 static OS_MUTEX speed_mutex;
 static OS_MUTEX direction_mutex;
@@ -57,6 +59,8 @@ static int currentLine = 0;
 
 static struct craft_thrust_struct thrust_data;
 static struct craft_direction_struct direction_data;
+static struct led_control_struct led0_data, led1_data;
+static const struct game_settings_struct settings_data;
 //static struct speed_struct speed_data;
 //static struct direction_struct direction_data;
 int capsenseMeasurement;
@@ -72,6 +76,8 @@ static void led0_ctrl_task(void *arg);
 static void led1_ctrl_task(void *arg);
 static void led0_on_task(void *arg);
 static void led1_on_task(void *arg);
+static void led0_on_cb(OS_TMR *p_tmr, void *arg);
+static void led1_on_cb(OS_TMR *p_tmr, void *arg);
 static void led0_off_cb(OS_TMR *p_tmr, void *arg);
 static void led1_off_cb(OS_TMR *p_tmr, void *arg);
 static void idle_task(void *arg);
@@ -114,6 +120,27 @@ void tasks_init(void)
 
   RTOS_ERR err;
 
+  // Define game settings
+  settings_data.blackoutAccel = 128; // m/s^2
+  settings_data.blackoutDuration = 20; //ms
+  settings_data.gravity = 8; // m/s^2
+  settings_data.vehicleMass = 2048; //kg
+  settings_data.maxThrust = 131072; //N, will accelerate the ship at 32m/s^2 when full of fuel
+  settings_data.initialFuelMass = 2048; // kg
+  settings_data.conversionEfficiency = 4096; // N/kg
+  settings_data.optionSelected = slider_rotational_rate__buttons_burst;
+  settings_data.xMin = 0;
+  settings_data.xMax = 1024;
+  settings_data.yMin = 0;
+  settings_data.yMax = 1024;
+  settings_data.maxHLandingSpeed = 4;
+  settings_data.maxVLandingSpeed = 8;
+  settings_data.initXVel = 0;
+  settings_data.initYVel = -8;
+  settings_data.initHPos = 512;
+  settings_data.rotationSpeedQuantaMin = 4; //Begrees/second
+  settings_data.rotationSpeedQuantaMax = 16; //Begrees/second
+  // Note: A "Begree" is a unit of angle measurement representing 1/256th of 360 degrees, because it makes a couple divisions faster and I'm in a silly goofy mood
 
   // Create LED output message queue
 //  OSQCreate(&led_message_queue,
@@ -476,8 +503,34 @@ static void led0_on_task(void *arg)
 {
     PP_UNUSED_PARAM(arg);
     RTOS_ERR err;
+
+    OSTmrCreate(&led0_on_timer,
+                "LED0 On Timer",
+                0,
+                led0_data.restartPeriod,
+                OS_OPT_TMR_PERIODIC,
+                (OS_TMR_CALLBACK_PTR) led0_on_cb,
+                (void*)0,
+                &err);
+    EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
+
+    OSTmrCreate(&led0_off_timer,
+                "LED0 Off Timer",
+                led0_data.timeFromOnToOff,
+                0,
+                OS_OPT_TMR_ONE_SHOT,
+                (OS_TMR_CALLBACK_PTR) led0_off_cb,
+                (void*)0,
+                &err);
+    EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
+
+    OSTmrStart(&led0_on_timer,
+               &err);
+
     while (1)
     {
+        // Pend on LED0 On timer semaphore
+        OSTmrStart(&led0_off_timer, &err);
         EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
     }
 }
@@ -488,11 +541,20 @@ static void led0_on_task(void *arg)
 static void led0_off_cb(OS_TMR *p_tmr, void *arg)
 {
     PP_UNUSED_PARAM(arg);
+    PP_UNUSED_PARAM(p_tmr);
+    GPIO_PinOutClear(LED0_port, LED0_pin);
+}
+
+/***************************************************************************//**
+ * LED0 on function.
+ ******************************************************************************/
+static void led0_on_cb(OS_TMR *p_tmr, void *arg)
+{
+    PP_UNUSED_PARAM(arg);
+    PP_UNUSED_PARAM(p_tmr);
     RTOS_ERR err;
-    while (1)
-    {
-        EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
-    }
+    GPIO_PinOutSet(LED0_port, LED0_pin);
+    // Post to LED0 On timer semaphore
 }
 
 
@@ -518,8 +580,34 @@ static void led1_on_task(void *arg)
 {
     PP_UNUSED_PARAM(arg);
     RTOS_ERR err;
+    OSTmrCreate(&led1_on_timer,
+                "LED1 On Timer",
+                0,
+                led1_data.restartPeriod,
+                OS_OPT_TMR_PERIODIC,
+                (OS_TMR_CALLBACK_PTR) led1_on_cb,
+                (void*)0,
+                &err);
+    EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
+
+    OSTmrCreate(&led1_off_timer,
+                "LED1 Off Timer",
+                led1_data.timeFromOnToOff,
+                0,
+                OS_OPT_TMR_ONE_SHOT,
+                (OS_TMR_CALLBACK_PTR) led1_off_cb,
+                (void*)0,
+                &err);
+    EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
+
+    OSTmrStart(&led1_on_timer,
+               &err);
+
     while (1)
     {
+        // Pend on LED1 On timer semaphore
+        OSTmrStart(&led1_off_timer,
+                   &err);
         EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
     }
 }
@@ -530,11 +618,20 @@ static void led1_on_task(void *arg)
 static void led1_off_cb(OS_TMR *p_tmr, void *arg)
 {
     PP_UNUSED_PARAM(arg);
+    PP_UNUSED_PARAM(p_tmr);
+    GPIO_PinOutClear(LED1_port, LED1_pin);
+}
+
+/***************************************************************************//**
+ * LED1 on function.
+ ******************************************************************************/
+static void led1_on_cb(OS_TMR *p_tmr, void *arg)
+{
+    PP_UNUSED_PARAM(arg);
+    PP_UNUSED_PARAM(p_tmr);
     RTOS_ERR err;
-    while (1)
-    {
-        EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
-    }
+    GPIO_PinOutSet(LED1_port, LED1_pin);
+    // Post to LED1 On timer semaphore
 }
 
 
