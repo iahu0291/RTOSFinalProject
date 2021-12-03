@@ -47,6 +47,7 @@ static CPU_STK  thrust_input_stack[THRUST_INPUT_TASK_STACK_SIZE],
 
 //static OS_Q led_message_queue;
 static OS_SEM button_semaphore, slider_semaphore, lcd_semaphore;
+static OS_FLAG_GRP status_flag_grp;
 static OS_TMR direction_timer;
 static OS_TMR led0_on_timer, led0_off_timer;
 static OS_TMR led1_on_timer, led1_off_timer;
@@ -59,10 +60,15 @@ static int currentLine = 0;
 
 static struct craft_thrust_struct thrust_data;
 static struct craft_direction_struct direction_data;
+static struct craft_position_struct position_data;
 static struct led_control_struct led0_data, led1_data;
-static const struct game_settings_struct settings_data;
-//static struct speed_struct speed_data;
-//static struct direction_struct direction_data;
+static struct game_settings_struct settings_data;
+
+enum status_flags{
+    status_flag_crashed = 1,
+    status_flag_landed = 2
+};
+
 int capsenseMeasurement;
 
 /*******************************************************************************
@@ -381,13 +387,13 @@ static void thrust_input_task(void *arg)
 //        OSSemPend(); //Pend waiting for button input change semaphore
 //        OSMutexPend(); //Pend waiting for thrust struct mutex access
         if(!GPIO_PinInGet(PSH1_port, PSH1_pin)){ //Button 1 pressed, max thrust
-            update_thrust(&thrust_data, thrust_max);
+            update_thrust_data(&thrust_data, thrust_max);
         }
         else if(!GPIO_PinInGet(PSH0_port, PSH0_pin)){ // Button 0 pressed, min thrust
-            update_thrust(&thrust_data, thrust_min);
+            update_thrust_data(&thrust_data, thrust_min);
         }
         else{
-            update_thrust(&thrust_data, thrust_none);
+            update_thrust_data(&thrust_data, thrust_none);
         }
 //        OSMutexPost(); //Release thrust struct mutex lock
 
@@ -477,7 +483,22 @@ static void physics_task(void *arg)
 
   while (1)
   {
-
+    // Pend on physics timer
+    // Pend on thrust, direction mutexes
+    tick_burn_fuel(&thrust_data, &direction_data, &settings_data);
+    // Pend on position mutex
+    tick_update_position(&thrust_data, &direction_data, &position_data, &settings_data);
+    switch(check_landing(&position_data, &settings_data)){
+      case game_ship_crashed:
+          // Post Crashed flag
+        break;
+      case game_ship_landed:
+          // Post Landed flag
+        break;
+      default:
+        break;
+    }
+    // Release pend on position, direction, thrust mutexes
   }
 }
 

@@ -12,7 +12,7 @@ CTEST_DATA(physics) {
 CTEST_SETUP(physics) {
     data->thrust_data->current_thrust = thrust_none;
     data->direction_data->current_direction = 0;
-    data->direction_data->current_ang_momentum = 0;
+    data->direction_data->current_rotation_rate = 0;
     data->position_data->current_x_position = data->settings->xMax/2;
     data->position_data->current_y_position = data->settings->yMax;
     data->position_data->current_x_vel = 0; 
@@ -56,7 +56,7 @@ CTEST2(physics, verify_min_thrust_no_dir) {
     data->position_data->current_y_vel = 0;
     data->thrust_data->current_thrust = thrust_min;
     tick_update_position(data->thrust_data, data->direction_data, data->position_data, data->settings);
-    int thrust_vel_expected = sqrt(2 * (10 * data->settings->fuelEnergyDensity) / (data->thrust_data->current_fuel + data->settings->vehicleMass));
+    int thrust_vel_expected = sqrt(2 * (10 * data->settings->conversionEfficiency) / (data->thrust_data->current_fuel + data->settings->vehicleMass));
     ASSERT_EQUAL(thrust_vel_expected - data->settings->gravity, data->position_data->current_y_vel);
     ASSERT_EQUAL((data->settings->yMax/2) - (thrust_vel_expected - data->settings->gravity), data->position_data->current_y_position);
 }
@@ -81,7 +81,7 @@ CTEST2(physics, verify_max_thrust_no_dir) {
     data->position_data->current_y_vel = 0;
     data->thrust_data->current_thrust = thrust_min;
     tick_update_position(data->thrust_data, data->direction_data, data->position_data, data->settings);
-    int thrust_vel_expected = sqrt(2 * (30 * data->settings->fuelEnergyDensity) / (data->thrust_data->current_fuel + data->settings->vehicleMass));
+    int thrust_vel_expected = sqrt(2 * (20 * data->settings->conversionEfficiency) / (data->thrust_data->current_fuel + data->settings->vehicleMass));
     ASSERT_EQUAL(thrust_vel_expected - data->settings->gravity, data->position_data->current_y_vel);
     ASSERT_EQUAL((data->settings->yMax/2) - (thrust_vel_expected - data->settings->gravity), data->position_data->current_y_position);
 }

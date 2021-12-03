@@ -10,7 +10,7 @@
 
 // Game Info structs
 struct game_settings_struct{
-  int version = 2;
+  int version; // Version = 2
   int gravity; // Virtual pixels/tick^2
   int vehicleMass;
   int xMin, xMax, yMin, yMax; //Total virtual pixels on screen
@@ -50,6 +50,7 @@ enum thrust_possibilities{
 struct craft_thrust_struct {
   int current_thrust;
   int current_fuel;
+  int blacked_out;
 };
 
 
