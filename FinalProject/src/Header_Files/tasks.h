@@ -31,10 +31,13 @@
 #define IDLE_TASK_PRIO                    50
 
 #define LCD_DISPLAY_TASK_STACK_SIZE       512
-#define LCD_DISPLAY_TASK_PRIO             20
+#define LCD_DISPLAY_TASK_PRIO             15
 
 #define PHYSICS_TASK_STACK_SIZE           512
-#define PHYSICS_TASK_PRIO                 20
+#define PHYSICS_TASK_PRIO                 10
+
+#define ENDGAME_TASK_STACK_SIZE           512
+#define ENDGAME_TASK_PRIO                 20
 
 //Function prototypes
 void tasks_init(void);

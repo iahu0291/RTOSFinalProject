@@ -58,15 +58,15 @@ gecko_sdk_3.2.2/platform/micrium_os/common/source/ring_buf/ring_buf.o: \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\device\siliconlabs\efm32pg12b\include\efm32pg12b_af_pins.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\emlib\inc\em_common.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\emlib\inc\em_assert.h \
- C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\autogen/sl_component_catalog.h \
- C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/emlib_core_debug_config.h \
+ C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\autogen/sl_component_catalog.h \
+ C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/emlib_core_debug_config.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\source\ring_buf\ring_buf_priv.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\cpu\include\cpu.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\cpu\include\cpu_def.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\include\rtos_path.h \
- C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\autogen/rtos_description.h \
+ C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\autogen/rtos_description.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\include\rtos_opt_def.h \
- C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/cpu_cfg.h \
+ C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/cpu_cfg.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\cpu\include\cpu_def.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\cpu\include\cpu_port_sel.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\ports\source\gnu\armv7m_cpu_port.h \
@@ -74,13 +74,13 @@ gecko_sdk_3.2.2/platform/micrium_os/common/source/ring_buf/ring_buf.o: \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\cpu\include\cpu_port_sel.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\include\lib_def.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\include\toolchains.h \
- C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/rtos_err_cfg.h \
+ C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/rtos_err_cfg.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\include\lib_mem.h \
- C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/common_cfg.h \
+ C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/common_cfg.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\source\rtos\rtos_utils_priv.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\include\lib_utils.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\include\rtos_utils.h \
- C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/rtos_cfg.h \
+ C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/rtos_cfg.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\source\logging\logging_priv.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\include\lib_str.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\include\lib_ascii.h \
@@ -94,12 +94,12 @@ gecko_sdk_3.2.2/platform/micrium_os/common/source/ring_buf/ring_buf.o: \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\kernel\include\os.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\include\lib_math.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\include\rtos_version.h \
- C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/os_cfg.h \
+ C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/os_cfg.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\kernel\include\os_type.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\kernel\include\os_port_sel.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\ports\source\gnu\armv7m_os_cpu.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\service\sleeptimer\inc\sl_sleeptimer.h \
- C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/sl_sleeptimer_config.h \
+ C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/sl_sleeptimer_config.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\common\inc\sl_status.h
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\common\toolchain\inc\sl_gcc_preinclude.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\emlib\inc\em_core.h:
@@ -159,15 +159,15 @@ c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\device\siliconlabs\efm32pg12b\include\efm32pg12b_af_pins.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\emlib\inc\em_common.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\emlib\inc\em_assert.h:
-C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\autogen/sl_component_catalog.h:
-C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/emlib_core_debug_config.h:
+C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\autogen/sl_component_catalog.h:
+C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/emlib_core_debug_config.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\source\ring_buf\ring_buf_priv.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\cpu\include\cpu.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\cpu\include\cpu_def.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\include\rtos_path.h:
-C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\autogen/rtos_description.h:
+C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\autogen/rtos_description.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\include\rtos_opt_def.h:
-C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/cpu_cfg.h:
+C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/cpu_cfg.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\cpu\include\cpu_def.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\cpu\include\cpu_port_sel.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\ports\source\gnu\armv7m_cpu_port.h:
@@ -175,13 +175,13 @@ c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\cpu\include\cpu_port_sel.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\include\lib_def.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\include\toolchains.h:
-C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/rtos_err_cfg.h:
+C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/rtos_err_cfg.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\include\lib_mem.h:
-C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/common_cfg.h:
+C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/common_cfg.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\source\rtos\rtos_utils_priv.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\include\lib_utils.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\include\rtos_utils.h:
-C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/rtos_cfg.h:
+C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/rtos_cfg.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\source\logging\logging_priv.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\include\lib_str.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\include\lib_ascii.h:
@@ -195,10 +195,10 @@ c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\kernel\include\os.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\include\lib_math.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\common\include\rtos_version.h:
-C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/os_cfg.h:
+C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/os_cfg.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\kernel\include\os_type.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\kernel\include\os_port_sel.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\micrium_os\ports\source\gnu\armv7m_os_cpu.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\service\sleeptimer\inc\sl_sleeptimer.h:
-C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/sl_sleeptimer_config.h:
+C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/sl_sleeptimer_config.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\common\inc\sl_status.h:

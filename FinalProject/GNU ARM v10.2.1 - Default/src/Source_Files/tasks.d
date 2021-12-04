@@ -111,7 +111,10 @@ src/Source_Files/tasks.o: ../src/Source_Files/tasks.c \
  C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\src\Header_Files/direction.h \
  C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\src\Header_Files/physics.h \
  C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\src\Header_Files/direction.h \
- C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\src\Header_Files/thrust.h
+ C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\src\Header_Files/thrust.h \
+ C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\src\Header_Files/lcdfunc.h \
+ C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\src\Header_Files/physics.h \
+ C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\src\Header_Files/ledfunc.h
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\common\toolchain\inc\sl_gcc_preinclude.h:
 C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\src\Header_Files/tasks.h:
 C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\src\Header_Files/gpio.h:
@@ -225,3 +228,6 @@ C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject
 C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\src\Header_Files/physics.h:
 C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\src\Header_Files/direction.h:
 C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\src\Header_Files/thrust.h:
+C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\src\Header_Files/lcdfunc.h:
+C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\src\Header_Files/physics.h:
+C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\src\Header_Files/ledfunc.h:

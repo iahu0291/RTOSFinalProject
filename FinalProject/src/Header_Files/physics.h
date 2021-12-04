@@ -11,16 +11,77 @@
 #include "direction.h"
 #include "thrust.h"
 
-// LED Ctrl Bitmasks
-#define LED0_DUTY_CYCLE_BITMASK   0b111111
-#define LED0_DUTY_CYCLE_SHIFT     0
-#define LED0_PERIOD_BITMASK       0b1111111111000000
-#define LED0_PERIOD_SHIFT         6
 
-#define LED1_DUTY_CYCLE_BITMASK   0b1111110000000000000000 // LED0_DUTY_CYCLE_BITMASK << 16
-#define LED1_DUTY_CYCLE_SHIFT     16
-#define LED1_PERIOD_BITMASK       0b11111111110000000000000000000000 // LED0_PERIOD_BITMASK << 16
-#define LED1_PERIOD_SHIFT         22
+
+//Easy Sin/Cos Lookup
+
+extern const int xMultVals[32];
+extern const int yMultVals[32];
+
+//extern const int xMultVals[32] = {1024,
+//    1004,
+//    946,
+//    851,
+//    724,
+//    569,
+//    392,
+//    200,
+//    0,
+//    -200,
+//    -392,
+//    -569,
+//    -724,
+//    -851,
+//    -946,
+//    -1004,
+//    -1024,
+//    -1004,
+//    -946,
+//    -851,
+//    -724,
+//    -569,
+//    -392,
+//    -200,
+//    0,
+//    200,
+//    392,
+//    569,
+//    724,
+//    851,
+//    946,
+//    1004};
+//extern const int yMultVals[32] = {0,
+//    200,
+//    392,
+//    569,
+//    724,
+//    851,
+//    946,
+//    1004,
+//    1024,
+//    1004,
+//    946,
+//    851,
+//    724,
+//    569,
+//    392,
+//    200,
+//    0,
+//    -200,
+//    -392,
+//    -569,
+//    -724,
+//    -851,
+//    -946,
+//    -1004,
+//    -1024,
+//    -1004,
+//    -946,
+//    -851,
+//    -724,
+//    -569,
+//    -392,
+//    -200};
 
 // Function Prototypes
 void tick_update_position(struct craft_thrust_struct *thrust_data, struct craft_direction_struct *direction_data, struct craft_position_struct *position_data, struct game_settings_struct *settings);

@@ -59,8 +59,8 @@ gecko_sdk_3.2.2/platform/common/src/sl_slist.o: \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\device\siliconlabs\efm32pg12b\include\efm32pg12b_af_pins.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\emlib\inc\em_common.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\emlib\inc\em_assert.h \
- C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\autogen/sl_component_catalog.h \
- C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/emlib_core_debug_config.h \
+ C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\autogen/sl_component_catalog.h \
+ C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/emlib_core_debug_config.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\common\inc\sl_slist.h
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\common\toolchain\inc\sl_gcc_preinclude.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\emlib\inc\em_assert.h:
@@ -121,6 +121,6 @@ c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\device\siliconlabs\efm32pg12b\include\efm32pg12b_af_pins.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\emlib\inc\em_common.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\emlib\inc\em_assert.h:
-C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\autogen/sl_component_catalog.h:
-C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/emlib_core_debug_config.h:
+C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\autogen/sl_component_catalog.h:
+C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/emlib_core_debug_config.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\common\inc\sl_slist.h:

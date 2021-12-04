@@ -59,10 +59,10 @@ gecko_sdk_3.2.2/platform/service/sleeptimer/src/sl_sleeptimer.o: \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\emlib\inc\em_assert.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\emlib\inc\em_core.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\emlib\inc\em_common.h \
- C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\autogen/sl_component_catalog.h \
- C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/emlib_core_debug_config.h \
+ C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\autogen/sl_component_catalog.h \
+ C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/emlib_core_debug_config.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\service\sleeptimer\inc\sl_sleeptimer.h \
- C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/sl_sleeptimer_config.h \
+ C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/sl_sleeptimer_config.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\common\inc\sl_status.h \
  C\:/SiliconLabs/SimplicityStudio/v5/developer/sdks/gecko_sdk_suite/v3.2/platform/service/sleeptimer/src/sli_sleeptimer_hal.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\service\sleeptimer\inc\sli_sleeptimer.h \
@@ -126,10 +126,10 @@ c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\emlib\inc\em_assert.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\emlib\inc\em_core.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\emlib\inc\em_common.h:
-C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\autogen/sl_component_catalog.h:
-C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/emlib_core_debug_config.h:
+C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\autogen/sl_component_catalog.h:
+C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/emlib_core_debug_config.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\service\sleeptimer\inc\sl_sleeptimer.h:
-C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/sl_sleeptimer_config.h:
+C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/sl_sleeptimer_config.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\common\inc\sl_status.h:
 C\:/SiliconLabs/SimplicityStudio/v5/developer/sdks/gecko_sdk_suite/v3.2/platform/service/sleeptimer/src/sli_sleeptimer_hal.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\service\sleeptimer\inc\sli_sleeptimer.h:

@@ -63,11 +63,11 @@ autogen/sl_simple_button_instances.o: \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\emlib\inc\em_bus.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\emlib\inc\em_core.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\emlib\inc\em_common.h \
- C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\autogen/sl_component_catalog.h \
- C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/emlib_core_debug_config.h \
+ C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\autogen/sl_component_catalog.h \
+ C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/emlib_core_debug_config.h \
  c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\common\inc\sl_status.h \
- C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/sl_simple_button_btn0_config.h \
- C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/sl_simple_button_btn1_config.h
+ C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/sl_simple_button_btn0_config.h \
+ C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/sl_simple_button_btn1_config.h
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\common\toolchain\inc\sl_gcc_preinclude.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\driver\button\inc\sl_simple_button.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\driver\button\inc\sl_button.h:
@@ -131,8 +131,8 @@ c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\emlib\inc\em_bus.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\emlib\inc\em_core.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\emlib\inc\em_common.h:
-C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\autogen/sl_component_catalog.h:
-C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/emlib_core_debug_config.h:
+C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\autogen/sl_component_catalog.h:
+C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/emlib_core_debug_config.h:
 c\:\siliconlabs\simplicitystudio\v5\developer\sdks\gecko_sdk_suite\v3.2\platform\common\inc\sl_status.h:
-C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/sl_simple_button_btn0_config.h:
-C\:\Users\Lena\Documents\School_Projects\ECEN_3753\FinalProject\config/sl_simple_button_btn1_config.h:
+C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/sl_simple_button_btn0_config.h:
+C\:\Users\Lena\Documents\School_Projects\ECEN_3753\RTOSFinalProject\FinalProject\config/sl_simple_button_btn1_config.h:

@@ -7,8 +7,8 @@
 #include "physics.h"
 
 // LOCAL VARIABLES
-
-static const int xMultVals[] ={1004,
+const int xMultVals[32] ={1024,
+    1004,
     946,
     851,
     724,
@@ -40,7 +40,8 @@ static const int xMultVals[] ={1004,
     946,
     1004};
 
-static const int yMultVals[] = {200,
+const int yMultVals[32] = {0,
+    200,
     392,
     569,
     724,
@@ -79,6 +80,10 @@ void tick_update_position(struct craft_thrust_struct *thrust_data, struct craft_
   // Calculate new rotation rate from angular thrust
   int xAccel = 0;
   int yAccel = 0;
+
+  // Calculate new velocity from thrust, direction, & gravity
+  int thrustOutput = (thrust_data->current_thrust * settings->maxThrust) >> 1;
+  int totalMass = settings->vehicleMass + thrust_data->current_fuel;
   if(!thrust_data->blacked_out){
     switch(direction_data->rotational_thrust){
       case hard_ccw:
@@ -106,9 +111,6 @@ void tick_update_position(struct craft_thrust_struct *thrust_data, struct craft_
     update_direction_data(direction_data, nextDirection);
 
 
-    // Calculate new velocity from thrust, direction, & gravity
-    int thrustOutput = (thrust_data->current_thrust * settings->maxThrust) >> 1;
-    int totalMass = settings->vehicleMass + thrust_data->current_fuel;
     // TODO: Make a final choice: Divide by totalMass b4 function, reducing accuracy,
     // Or divide by totalMass after function twice, reducing speed.
     divide_thrust(thrustOutput / totalMass, direction_data->current_direction, &xAccel, &yAccel);
@@ -116,7 +118,7 @@ void tick_update_position(struct craft_thrust_struct *thrust_data, struct craft_
   position_data->current_x_vel += xAccel;
   position_data->current_y_vel += yAccel - settings->gravity;
 
-  if((xAccel^2)+(yAccel^2) >= settings->blackoutAccel){
+  if(thrustOutput/totalMass >= settings->blackoutAccel){
       // Start Blackout Timer
 
       thrust_data->blacked_out = 1;
@@ -131,7 +133,7 @@ void tick_update_position(struct craft_thrust_struct *thrust_data, struct craft_
 void tick_burn_fuel(struct craft_thrust_struct *thrust_data, struct craft_direction_struct *direction_data, struct game_settings_struct *settings){
   int kg_fuel_burned = ((thrust_data->current_thrust * settings->maxThrust) >> 1) // Thrust in Newtons
       / settings->conversionEfficiency; // N/kg
-  thrust_data->current_thrust -= kg_fuel_burned;
+  thrust_data->current_fuel -= kg_fuel_burned;
 }
 
 int check_landing(struct craft_position_struct *position_data, struct game_settings_struct *settings){
@@ -157,15 +159,17 @@ int check_landing(struct craft_position_struct *position_data, struct game_setti
 unsigned int get_led_ctrls(struct craft_thrust_struct *thrust_data, struct game_settings_struct *settings){
   unsigned int led0_dutyCycle, led1_dutyCycle, led0_period, led1_period;
   unsigned int returnVal = 0;
-  led0_dutyCycle = 32 * thrust_data->current_thrust;
-  led0_period = 16;
-  if(!thrust_data->blacked_out){
-    led1_dutyCycle = ((thrust_data->current_thrust * settings->maxThrust) / settings->blackoutAccel) * 64;
-    led1_period = 16;
+  led0_dutyCycle = 16 * thrust_data->current_thrust;
+  led0_period = 4;
+  if((thrust_data->blacked_out)){
+      led1_dutyCycle  = 16;
+      led1_period = 16;
   }
   else{
-    led1_dutyCycle  = 32;
-    led1_period = 333;
+      int thrustNum = ((thrust_data->current_thrust * settings->maxThrust)/2);
+      int vehicleMass = (settings->vehicleMass + thrust_data->current_fuel);
+      led1_dutyCycle = ((thrustNum * 32) / (settings->blackoutAccel * vehicleMass));
+      led1_period = 8;
   }
   returnVal += led1_period << LED1_PERIOD_SHIFT;
   returnVal += led1_dutyCycle << LED1_DUTY_CYCLE_SHIFT;
@@ -177,6 +181,6 @@ unsigned int get_led_ctrls(struct craft_thrust_struct *thrust_data, struct game_
 
 void divide_thrust(int thrust, int direction, int *xThrust, int* yThrust){
   int directionLookup = ((direction + 4) % 256) >> 3; //Direction divided by 8
-  *xThrust = (thrust * xMultVals[directionLookup]) >> 10;
+  *xThrust = -(thrust * xMultVals[directionLookup]) >> 10;
   *yThrust = (thrust * yMultVals[directionLookup]) >> 10;
 }
