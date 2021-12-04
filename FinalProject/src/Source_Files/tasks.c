@@ -28,13 +28,15 @@
 #include "thrust.h"
 #include "direction.h"
 #include "physics.h"
+#include "lcdfunc.h"
+#include "ledfunc.h"
 
 /*******************************************************************************
  ***************************  LOCAL VARIABLES   ********************************
  ******************************************************************************/
 
 static OS_TCB thrust_input_tcb, direction_input_tcb, led0_ctrl_tcb, led1_ctrl_tcb,
-              idle_tcb, lcd_display_tcb, physics_tcb, led0_on_tcb, led1_on_tcb;
+              idle_tcb, lcd_display_tcb, physics_tcb, led0_on_tcb, led1_on_tcb, endgame_tcb;
 static CPU_STK  thrust_input_stack[THRUST_INPUT_TASK_STACK_SIZE],
                 direction_input_stack[DIRECTION_INPUT_TASK_STACK_SIZE],
                 led0_ctrl_stack[LED0_CTRL_TASK_STACK_SIZE],
@@ -43,17 +45,18 @@ static CPU_STK  thrust_input_stack[THRUST_INPUT_TASK_STACK_SIZE],
                 led1_on_stack[LED1_ON_TASK_STACK_SIZE],
                 idle_stack[IDLE_TASK_STACK_SIZE],
                 lcd_display_stack[LCD_DISPLAY_TASK_STACK_SIZE],
-                physics_stack[PHYSICS_TASK_STACK_SIZE];
+                physics_stack[PHYSICS_TASK_STACK_SIZE],
+                endgame_stack[ENDGAME_TASK_STACK_SIZE];
 
 //static OS_Q led_message_queue;
-static OS_SEM button_semaphore, slider_semaphore, lcd_semaphore;
-static OS_FLAG_GRP status_flag_grp;
-static OS_TMR direction_timer;
+static OS_SEM button_semaphore, slider_semaphore, lcd_semaphore, physics_semaphore;
+static OS_SEM led0_on_semaphore, led1_on_semaphore;
+static OS_FLAG_GRP endgame_flag_grp;
+static OS_TMR direction_timer, physics_timer, blackout_timer;
 static OS_TMR led0_on_timer, led0_off_timer;
 static OS_TMR led1_on_timer, led1_off_timer;
 
-static OS_MUTEX speed_mutex;
-static OS_MUTEX direction_mutex;
+static OS_MUTEX thrust_mutex, direction_mutex, position_mutex;
 
 static GLIB_Context_t glib_context;
 static int currentLine = 0;
@@ -64,12 +67,12 @@ static struct craft_position_struct position_data;
 static struct led_control_struct led0_data, led1_data;
 static struct game_settings_struct settings_data;
 
-enum status_flags{
-    status_flag_crashed = 1,
-    status_flag_landed = 2
+enum endgame_flags{
+    endgame_flag_crashed = 1,
+    endgame_flag_landed = 2
 };
 
-int capsenseMeasurement;
+int capsenseMeasurement = 0;
 
 /*******************************************************************************
  *********************   LOCAL FUNCTION PROTOTYPES   ***************************
@@ -88,7 +91,10 @@ static void led0_off_cb(OS_TMR *p_tmr, void *arg);
 static void led1_off_cb(OS_TMR *p_tmr, void *arg);
 static void idle_task(void *arg);
 static void physics_task(void *arg);
+static void physics_timer_callback(OS_TMR *p_tmr, void *p_arg);
+static void blackout_timer_callback(OS_TMR *p_tmr, void *p_arg);
 static void lcd_display_task(void *arg);
+static void endgame_task(void *arg);
 
 /*******************************************************************************
  **************************   GLOBAL FUNCTIONS   *******************************
@@ -127,9 +133,9 @@ void tasks_init(void)
   RTOS_ERR err;
 
   // Define game settings
-  settings_data.blackoutAccel = 128; // m/s^2
+  settings_data.blackoutAccel = 48; // m/s^2
   settings_data.blackoutDuration = 20; //ms
-  settings_data.gravity = 8; // m/s^2
+  settings_data.gravity = 4; // m/s^2
   settings_data.vehicleMass = 2048; //kg
   settings_data.maxThrust = 131072; //N, will accelerate the ship at 32m/s^2 when full of fuel
   settings_data.initialFuelMass = 2048; // kg
@@ -139,14 +145,40 @@ void tasks_init(void)
   settings_data.xMax = 1024;
   settings_data.yMin = 0;
   settings_data.yMax = 1024;
-  settings_data.maxHLandingSpeed = 4;
-  settings_data.maxVLandingSpeed = 8;
+  settings_data.maxHLandingSpeed = 32;
+  settings_data.maxVLandingSpeed = 64;
   settings_data.initXVel = 0;
   settings_data.initYVel = -8;
   settings_data.initHPos = 512;
-  settings_data.rotationSpeedQuantaMin = 4; //Begrees/second
-  settings_data.rotationSpeedQuantaMax = 16; //Begrees/second
+  settings_data.rotationSpeedQuantaMin = 1; //Begrees/second
+  settings_data.rotationSpeedQuantaMax = 4; //Begrees/second
   // Note: A "Begree" is a unit of angle measurement representing 1/256th of 360 degrees, because it makes a couple divisions faster and I'm in a silly goofy mood
+
+
+
+  //Initialize Data constructs
+  //Thrust data
+  thrust_data.blacked_out = 0;
+  thrust_data.current_fuel = settings_data.initialFuelMass;
+  thrust_data.current_thrust = thrust_none;
+
+  //Direction data
+  direction_data.current_direction = 64; //Directly up
+  direction_data.current_rotation_rate = 0;
+  direction_data.rotational_thrust = no_rot;
+
+  //Position data
+  position_data.current_x_position = settings_data.xMax / 2;
+  position_data.current_y_position = settings_data.yMax / 2;
+  position_data.current_x_vel = 0;
+  position_data.current_y_vel = 0;
+
+  //LED data
+  led0_data.restartPeriod = 10;
+  led0_data.timeFromOnToOff = 10;
+  led1_data.restartPeriod = 10;
+  led1_data.timeFromOnToOff = 10;
+
 
   // Create LED output message queue
 //  OSQCreate(&led_message_queue,
@@ -154,6 +186,12 @@ void tasks_init(void)
 //            2,
 //            &err);
 //  EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
+
+  OSFlagCreate(&endgame_flag_grp,
+               "Endgame Flag Group",
+               0,
+               &err);
+  EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
 
   // Create button semaphore
   OSSemCreate(&button_semaphore,
@@ -171,22 +209,61 @@ void tasks_init(void)
 
   // Create lcd semaphore
   OSSemCreate(&lcd_semaphore,
-              "LCD Timer Semaphore",
+              "LCD Update Semaphore",
               0,
               &err);
   EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
 
+  // Create led0 on semaphore
+  OSSemCreate(&led0_on_semaphore,
+              "LED0 On Semaphore",
+              0,
+              &err);
+  EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
+  // Create led1 on semaphore
+  OSSemCreate(&led1_on_semaphore,
+              "LED1 On Semaphore",
+              0,
+              &err);
+  EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
+
+  // Create slider semaphore
+    OSSemCreate(&physics_semaphore,
+                "Physics Timer Semaphore",
+                0,
+                &err);
+    EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
 
   // Create slider Timer
   OSTmrCreate(&direction_timer,
               "Direction Task Timer",
               1,
-              1,
+              2,
               OS_OPT_TMR_PERIODIC,
               (OS_TMR_CALLBACK_PTR) direction_timer_callback,
               (void*)0,
               &err);
   EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
+
+  OSTmrCreate(&physics_timer,
+                "Physics Timer",
+                1,
+                2,
+                OS_OPT_TMR_PERIODIC,
+                (OS_TMR_CALLBACK_PTR) physics_timer_callback,
+                (void*)0,
+                &err);
+    EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
+
+    OSTmrCreate(&blackout_timer,
+                  "Blackout Timer",
+                  settings_data.blackoutDuration,
+                  0,
+                  OS_OPT_TMR_ONE_SHOT,
+                  (OS_TMR_CALLBACK_PTR) blackout_timer_callback,
+                  (void*)0,
+                  &err);
+      EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
 
   // Create LCD timer
 //  OSTmrCreate(&lcd_timer,
@@ -212,13 +289,17 @@ void tasks_init(void)
 
 
   //Create speed mutex
-  OSMutexCreate(&speed_mutex,
-                "Speed data mutex",
+  OSMutexCreate(&thrust_mutex,
+                "Thrust data mutex",
                 &err);
 
   //Create direction mutex
   OSMutexCreate(&direction_mutex,
                 "Direction data mutex",
+                &err);
+
+  OSMutexCreate(&position_mutex,
+                "Position data mutex",
                 &err);
 
   // Create thrust input Task
@@ -365,6 +446,22 @@ void tasks_init(void)
                &err);
   EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
 
+  // Create endgame task
+  OSTaskCreate(&endgame_tcb,
+               "Endgame task",
+               endgame_task,
+               DEF_NULL,
+               ENDGAME_TASK_PRIO,
+               &endgame_stack[0],
+               (ENDGAME_TASK_STACK_SIZE / 10u),
+               ENDGAME_TASK_STACK_SIZE,
+               0u,
+               0u,
+               DEF_NULL,
+               (OS_OPT_TASK_STK_CLR),
+               &err);
+  EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
+
 
 
 
@@ -380,12 +477,22 @@ static void thrust_input_task(void *arg)
 
 
 
-    EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
+//    EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
 
     while (1)
     {
 //        OSSemPend(); //Pend waiting for button input change semaphore
 //        OSMutexPend(); //Pend waiting for thrust struct mutex access
+        OSSemPend(&button_semaphore,
+                  0,
+                  OS_OPT_PEND_BLOCKING,
+                  (CPU_TS*) 0,
+                  &err);
+        OSMutexPend(&thrust_mutex,
+                    0,
+                    OS_OPT_PEND_BLOCKING,
+                    (CPU_TS*)0,
+                    &err);
         if(!GPIO_PinInGet(PSH1_port, PSH1_pin)){ //Button 1 pressed, max thrust
             update_thrust_data(&thrust_data, thrust_max);
         }
@@ -396,6 +503,9 @@ static void thrust_input_task(void *arg)
             update_thrust_data(&thrust_data, thrust_none);
         }
 //        OSMutexPost(); //Release thrust struct mutex lock
+        OSMutexPost(&thrust_mutex,
+                    OS_OPT_POST_NONE,
+                    &err);
 
     }
 }
@@ -412,28 +522,42 @@ static void direction_input_task(void *arg)
     CAPSENSE_Init();
 
     EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
-    int prevCapsenseMeas;
+    int prevCapsenseMeas = 0;
     while (1)
     {
 //        OSSemPend(); // Pend on direction timer callback semaphore
+        OSSemPend(&slider_semaphore,
+                  0,
+                  OS_OPT_PEND_BLOCKING,
+                  (CPU_TS*)0,
+                  &err);
+        capsense_poll();
         if(prevCapsenseMeas != capsenseMeasurement){ // We need to update directiondata
 //            OSMutexPend(); // Wait for direction data mutex lock
+            OSMutexPend(&direction_mutex,
+                        0,
+                        OS_OPT_PEND_BLOCKING,
+                        (CPU_TS*)0,
+                        &err);
             if(capsenseMeasurement == -2){
-                update_direction_data(&direction_data, hard_ccw);
+                update_direction_thrust_data(&direction_data, hard_ccw);
             }
             else if(capsenseMeasurement == -1){
-                update_direction_data(&direction_data, soft_ccw);
+                update_direction_thrust_data(&direction_data, soft_ccw);
             }
             else if(capsenseMeasurement == 0){
-                update_direction_data(&direction_data, no_rot);
+                update_direction_thrust_data(&direction_data, no_rot);
             }
             else if(capsenseMeasurement == 1){
-                update_direction_data(&direction_data, soft_cw);
+                update_direction_thrust_data(&direction_data, soft_cw);
             }
             else {
-                update_direction_data(&direction_data, hard_cw);
+                update_direction_thrust_data(&direction_data, hard_cw);
             }
 //            OSMutexPost(); // Release direction data mutex lock
+            OSMutexPost(&direction_mutex,
+                        OS_OPT_POST_NONE,
+                        &err);
         }
         prevCapsenseMeas = capsenseMeasurement;
     }
@@ -480,28 +604,138 @@ static void physics_task(void *arg)
 {
   PP_UNUSED_PARAM(arg);
   RTOS_ERR err;
-
+  OSTmrStart(&physics_timer,&err);
+  unsigned int prevledctrls = 0;
   while (1)
   {
     // Pend on physics timer
+    OSSemPend(&physics_semaphore,
+              0,
+              OS_OPT_PEND_BLOCKING,
+              (CPU_TS*)0,
+              &err);
+
     // Pend on thrust, direction mutexes
-    tick_burn_fuel(&thrust_data, &direction_data, &settings_data);
+    OSMutexPend(&thrust_mutex,
+                0,
+                OS_OPT_PEND_BLOCKING,
+                (CPU_TS*)0,
+                &err);
+    OSMutexPend(&direction_mutex,
+                0,
+                OS_OPT_PEND_BLOCKING,
+                (CPU_TS*)0,
+                &err);
+
+    // Burn Fuel if not blacked out
+    if(!thrust_data.blacked_out){
+      tick_burn_fuel(&thrust_data, &direction_data, &settings_data);
+    }
+
     // Pend on position mutex
+    OSMutexPend(&position_mutex,
+                0,
+                OS_OPT_PEND_BLOCKING,
+                (CPU_TS*)0,
+                &err);
+
     tick_update_position(&thrust_data, &direction_data, &position_data, &settings_data);
+    // Post to lcd semaphore
+    OSSemPost(&lcd_semaphore,
+              OS_OPT_POST_ALL + OS_OPT_POST_NO_SCHED,
+              &err);
+
+    unsigned int ledCtrls = get_led_ctrls(&thrust_data,&settings_data);
+    if(ledCtrls != prevledctrls){
+        input_led_ctrl_data(&led0_data, ledCtrls);
+        input_led_ctrl_data(&led1_data, ledCtrls >> 16);
+    }
+
     switch(check_landing(&position_data, &settings_data)){
       case game_ship_crashed:
-          // Post Crashed flag
+        OSFlagPost(&endgame_flag_grp,
+                   endgame_flag_crashed,
+                   OS_OPT_POST_FLAG_SET +
+                   OS_OPT_POST_NO_SCHED,
+                   &err);
+        OSTmrStop(&physics_timer,
+                  OS_OPT_TMR_NONE,
+                  (void*)0,
+                  &err);
         break;
       case game_ship_landed:
-          // Post Landed flag
+        OSFlagPost(&endgame_flag_grp,
+                   endgame_flag_landed,
+                   OS_OPT_POST_FLAG_SET +
+                   OS_OPT_POST_NO_SCHED,
+                   &err);
+        OSTmrStop(&physics_timer,
+                  OS_OPT_TMR_NONE,
+                  (void*)0,
+                  &err);
         break;
       default:
         break;
     }
-    // Release pend on position, direction, thrust mutexes
+    // Release hold on position, direction, thrust mutexes
+    OSMutexPost(&position_mutex,
+                OS_OPT_POST_NO_SCHED,
+                &err);
+    OSMutexPost(&direction_mutex,
+                OS_OPT_POST_NO_SCHED,
+                &err);
+    OSMutexPost(&thrust_mutex,
+                OS_OPT_POST_NONE,
+                &err);
   }
 }
 
+/*************************************************
+ * Endgame task.
+ *************************************************/
+static void endgame_task(void *arg)
+{
+  PP_UNUSED_PARAM(arg);
+  RTOS_ERR err;
+  while (1)
+  {
+    int flag = OSFlagPend(&endgame_flag_grp,
+                          endgame_flag_crashed + endgame_flag_landed,
+                          0,
+                          OS_OPT_PEND_FLAG_SET_ANY +
+                          OS_OPT_PEND_FLAG_CONSUME +
+                          OS_OPT_PEND_BLOCKING,
+                          (CPU_TS*)0,
+                          &err);
+//    OSSemSet(&lcd_semaphore,
+//             0,
+//             &err); //We don't want to update the LCD anymore
+
+    switch(flag){
+      case endgame_flag_crashed:
+          displayEndgameScreen(&glib_context, "Crashed!");
+//          GLIB_drawStringOnLine(&glib_context,
+//                                "Crashed!",
+//                                0,
+//                                GLIB_ALIGN_CENTER,
+//                                5,
+//                                5,
+//                                true);
+
+        break;
+      case endgame_flag_landed:
+          displayEndgameScreen(&glib_context, "Landed!");
+//        GLIB_drawStringOnLine(&glib_context,
+//                              "Crashed!",
+//                              1,
+//                              GLIB_ALIGN_CENTER,
+//                              5,
+//                              5,
+//                              true);
+        break;
+    }
+  }
+}
 
 
 /***************************************************************************//**
@@ -509,12 +743,13 @@ static void physics_task(void *arg)
  ******************************************************************************/
 static void led0_ctrl_task(void *arg)
 {
-    PP_UNUSED_PARAM(arg);
-    RTOS_ERR err;
-    while (1)
-    {
-        EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
-    }
+  //TODO
+  PP_UNUSED_PARAM(arg);
+  RTOS_ERR err;
+//  while (1)
+//  {
+//      EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
+//  }
 }
 
 /***************************************************************************//**
@@ -551,6 +786,26 @@ static void led0_on_task(void *arg)
     while (1)
     {
         // Pend on LED0 On timer semaphore
+        OSSemPend(&led0_on_semaphore,
+                  0,
+                  OS_OPT_PEND_BLOCKING,
+                  (CPU_TS*)0,
+                  &err);
+        OSTmrSet(&led0_on_timer,
+                 0,
+                 led0_data.restartPeriod,
+                 (OS_TMR_CALLBACK_PTR) led0_on_cb,
+                 (void*)0,
+                 &err);
+        if(led0_data.timeFromOnToOff){
+            GPIO_PinOutSet(LED0_port, LED0_pin);
+            OSTmrSet(&led0_off_timer,
+                     led0_data.timeFromOnToOff,
+                     0,
+                     (OS_TMR_CALLBACK_PTR) led0_off_cb,
+                     (void*)0,
+                     &err);
+        }
         OSTmrStart(&led0_off_timer, &err);
         EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
     }
@@ -574,7 +829,9 @@ static void led0_on_cb(OS_TMR *p_tmr, void *arg)
     PP_UNUSED_PARAM(arg);
     PP_UNUSED_PARAM(p_tmr);
     RTOS_ERR err;
-    GPIO_PinOutSet(LED0_port, LED0_pin);
+    OSSemPost(&led0_on_semaphore,
+              OS_OPT_POST_ALL,
+              &err);
     // Post to LED0 On timer semaphore
 }
 
@@ -586,12 +843,13 @@ static void led0_on_cb(OS_TMR *p_tmr, void *arg)
  ******************************************************************************/
 static void led1_ctrl_task(void *arg)
 {
-    PP_UNUSED_PARAM(arg);
-    RTOS_ERR err;
-    while (1)
-    {
-        EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
-    }
+  //TODO
+  PP_UNUSED_PARAM(arg);
+  RTOS_ERR err;
+//  while (1)
+//  {
+//      EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
+//  }
 }
 
 /***************************************************************************//**
@@ -627,6 +885,26 @@ static void led1_on_task(void *arg)
     while (1)
     {
         // Pend on LED1 On timer semaphore
+        OSSemPend(&led1_on_semaphore,
+                  0,
+                  OS_OPT_PEND_BLOCKING,
+                  (CPU_TS*)0,
+                  &err);
+        OSTmrSet(&led1_on_timer,
+                 0,
+                 led1_data.restartPeriod,
+                 (OS_TMR_CALLBACK_PTR) led1_on_cb,
+                 (void*)0,
+                 &err);
+        if(led1_data.timeFromOnToOff){
+            GPIO_PinOutSet(LED1_port, LED1_pin);
+            OSTmrSet(&led1_off_timer,
+                     led1_data.timeFromOnToOff,
+                     0,
+                     (OS_TMR_CALLBACK_PTR) led1_off_cb,
+                     (void*)0,
+                     &err);
+        }
         OSTmrStart(&led1_off_timer,
                    &err);
         EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
@@ -651,7 +929,9 @@ static void led1_on_cb(OS_TMR *p_tmr, void *arg)
     PP_UNUSED_PARAM(arg);
     PP_UNUSED_PARAM(p_tmr);
     RTOS_ERR err;
-    GPIO_PinOutSet(LED1_port, LED1_pin);
+    OSSemPost(&led1_on_semaphore,
+              OS_OPT_POST_ALL,
+              &err);
     // Post to LED1 On timer semaphore
 }
 
@@ -664,9 +944,39 @@ static void lcd_display_task(void *arg)
     PP_UNUSED_PARAM(arg);
     RTOS_ERR err;
 
-    char displayStr1[10];
+//    char displayStr1[10];
     while (1)
     {
+        //Pend on LCD semaphore
+        OSSemPend(&lcd_semaphore,
+                  0,
+                  OS_OPT_PEND_BLOCKING,
+                  (CPU_TS*)0,
+                  &err);
+
+
+        OSMutexPend(&direction_mutex,
+                    0,
+                    OS_OPT_PEND_BLOCKING,
+                    (CPU_TS*)0,
+                    &err);
+        OSMutexPend(&position_mutex,
+                    0,
+                    OS_OPT_PEND_BLOCKING,
+                    (CPU_TS*)0,
+                    &err);
+        GLIB_clear(&glib_context);
+        DMD_DisplayGeometry* geometry;
+        DMD_getDisplayGeometry(&geometry);
+        displayShipPolygon(&glib_context, &position_data, &direction_data, &settings_data);
+        DMD_updateDisplay();
+
+        OSMutexPost(&position_mutex,
+                    OS_OPT_POST_NO_SCHED,
+                    &err);
+        OSMutexPost(&direction_mutex,
+                    OS_OPT_POST_NO_SCHED,
+                    &err);
 
 //        GLIB_clear(&glib_context);
 //        GLIB_setFont(&glib_context, (GLIB_Font_t *) &GLIB_FontNumber16x20);
@@ -750,6 +1060,9 @@ static void idle_task(void *arg)
 void GPIO_EVEN_IRQHandler(void){
   RTOS_ERR err;
   GPIO_IntClear(1 << PSH0_pin);
+  OSSemPost(&button_semaphore,
+            OS_OPT_POST_ALL,
+            &err);
 //  if((!GPIO_PinInGet(PSH0_port, PSH0_pin)) && (GPIO_PinInGet(PSH1_port, PSH1_pin))){ //button 1 off & button 0 pressed
 //      speedUpReady = 1;
 //  }
@@ -766,6 +1079,9 @@ void GPIO_EVEN_IRQHandler(void){
 void GPIO_ODD_IRQHandler(void){
   RTOS_ERR err;
   GPIO_IntClear(1 << PSH1_pin);
+  OSSemPost(&button_semaphore,
+            OS_OPT_POST_ALL,
+            &err);
 //  if((!GPIO_PinInGet(PSH1_port, PSH1_pin)) && (GPIO_PinInGet(PSH0_port, PSH0_pin))){ //button 1 pressed & button 0 off
 //      speedDownReady = 1;
 //  }
@@ -786,5 +1102,50 @@ static void direction_timer_callback(OS_TMR *p_tmr, void *p_arg){
   OSSemPost(&slider_semaphore,
             OS_OPT_POST_ALL,
             &err);
+  EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
+}
+
+/*****************************************************************************
+ * @brief
+ *   Physics timer callback function
+ *
+ * @details
+ *   Posts to the capsense function when it's time to detect the direction again
+ *
+ ****************************************************************************/
+static void physics_timer_callback(OS_TMR *p_tmr, void *p_arg){
+  PP_UNUSED_PARAM(p_arg);
+  PP_UNUSED_PARAM(p_tmr);
+  RTOS_ERR err;
+  OSSemPost(&physics_semaphore,
+            OS_OPT_POST_ALL,
+            &err);
+  EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
+}
+
+/*****************************************************************************
+ * @brief
+ *   Blackout timer callback function
+ *
+ * @details
+ *   Posts to the capsense function when it's time to detect the direction again
+ *
+ ****************************************************************************/
+static void blackout_timer_callback(OS_TMR *p_tmr, void *p_arg){
+  PP_UNUSED_PARAM(p_arg);
+  PP_UNUSED_PARAM(p_tmr);
+  RTOS_ERR err;
+  OSMutexPend(&thrust_mutex,
+              0,
+              OS_OPT_PEND_BLOCKING,
+              (CPU_TS*)0,
+              &err);
+  thrust_data.blacked_out = 0;
+  OSMutexPost(&thrust_mutex,
+              OS_OPT_POST_NONE,
+              &err);
+//  OSSemPost(&blackout_over_semaphore,
+//            OS_OPT_POST_ALL,
+//            &err);
   EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
 }
