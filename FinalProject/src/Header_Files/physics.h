@@ -12,7 +12,6 @@
 #include "thrust.h"
 
 
-
 //Easy Sin/Cos Lookup
 
 extern const int xMultVals[32];

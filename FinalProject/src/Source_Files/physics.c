@@ -103,9 +103,14 @@ void tick_update_position(struct craft_thrust_struct *thrust_data, struct craft_
 
     // Calculate new rotation angle from angular rotation rate
     int nextDirection = direction_data->current_direction + direction_data->current_rotation_rate;
-    if(nextDirection >= 256){
-      nextDirection -= 256;
-    } // nextDirection will range from 0 - 255. 0 will represent pointing right
+
+    while(nextDirection >= 256){
+        nextDirection -= 256;
+    }
+    while(nextDirection < 0){
+        nextDirection += 256;
+    }
+    // nextDirection will range from 0 - 255. 0 will represent pointing right
 
   //  direction_data->current_direction = nextDirection;
     update_direction_data(direction_data, nextDirection);
@@ -119,8 +124,6 @@ void tick_update_position(struct craft_thrust_struct *thrust_data, struct craft_
   position_data->current_y_vel += yAccel - settings->gravity;
 
   if(thrustOutput/totalMass >= settings->blackoutAccel){
-      // Start Blackout Timer
-
       thrust_data->blacked_out = 1;
   }
 
@@ -163,13 +166,13 @@ unsigned int get_led_ctrls(struct craft_thrust_struct *thrust_data, struct game_
   led0_period = 4;
   if((thrust_data->blacked_out)){
       led1_dutyCycle  = 16;
-      led1_period = 16;
+      led1_period = 10;
   }
   else{
       int thrustNum = ((thrust_data->current_thrust * settings->maxThrust)/2);
       int vehicleMass = (settings->vehicleMass + thrust_data->current_fuel);
       led1_dutyCycle = ((thrustNum * 32) / (settings->blackoutAccel * vehicleMass));
-      led1_period = 8;
+      led1_period = 4;
   }
   returnVal += led1_period << LED1_PERIOD_SHIFT;
   returnVal += led1_dutyCycle << LED1_DUTY_CYCLE_SHIFT;

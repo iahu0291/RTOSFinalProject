@@ -57,6 +57,7 @@ static OS_TMR led0_on_timer, led0_off_timer;
 static OS_TMR led1_on_timer, led1_off_timer;
 
 static OS_MUTEX thrust_mutex, direction_mutex, position_mutex;
+static int timerStarted = 0;
 
 static GLIB_Context_t glib_context;
 static int currentLine = 0;
@@ -133,11 +134,11 @@ void tasks_init(void)
   RTOS_ERR err;
 
   // Define game settings
-  settings_data.blackoutAccel = 48; // m/s^2
-  settings_data.blackoutDuration = 20; //ms
-  settings_data.gravity = 4; // m/s^2
+  settings_data.blackoutAccel = 12; // m/s^2
+  settings_data.blackoutDuration = 30; //20ths of a second
+  settings_data.gravity = 2; // m/s^2
   settings_data.vehicleMass = 2048; //kg
-  settings_data.maxThrust = 131072; //N, will accelerate the ship at 32m/s^2 when full of fuel
+  settings_data.maxThrust = 32768; //N, will accelerate the ship at 8m/s^2 when full of fuel; alt 131072, for 32m/s^2
   settings_data.initialFuelMass = 2048; // kg
   settings_data.conversionEfficiency = 4096; // N/kg
   settings_data.optionSelected = slider_rotational_rate__buttons_burst;
@@ -145,8 +146,8 @@ void tasks_init(void)
   settings_data.xMax = 1024;
   settings_data.yMin = 0;
   settings_data.yMax = 1024;
-  settings_data.maxHLandingSpeed = 32;
-  settings_data.maxVLandingSpeed = 64;
+  settings_data.maxHLandingSpeed = 16;
+  settings_data.maxVLandingSpeed = 32;
   settings_data.initXVel = 0;
   settings_data.initYVel = -8;
   settings_data.initHPos = 512;
@@ -248,22 +249,22 @@ void tasks_init(void)
   OSTmrCreate(&physics_timer,
                 "Physics Timer",
                 1,
-                2,
+                1,
                 OS_OPT_TMR_PERIODIC,
                 (OS_TMR_CALLBACK_PTR) physics_timer_callback,
                 (void*)0,
                 &err);
-    EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
+  EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
 
-    OSTmrCreate(&blackout_timer,
-                  "Blackout Timer",
-                  settings_data.blackoutDuration,
-                  0,
-                  OS_OPT_TMR_ONE_SHOT,
-                  (OS_TMR_CALLBACK_PTR) blackout_timer_callback,
-                  (void*)0,
-                  &err);
-      EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
+  OSTmrCreate(&blackout_timer,
+                "Blackout Timer",
+                settings_data.blackoutDuration,
+                0,
+                OS_OPT_TMR_ONE_SHOT,
+                (OS_TMR_CALLBACK_PTR) blackout_timer_callback,
+                (void*)0,
+                &err);
+  EFM_ASSERT((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE));
 
   // Create LCD timer
 //  OSTmrCreate(&lcd_timer,
@@ -640,6 +641,10 @@ static void physics_task(void *arg)
                 &err);
 
     tick_update_position(&thrust_data, &direction_data, &position_data, &settings_data);
+    if(thrust_data.blacked_out && (!timerStarted)){
+      OSTmrStart(&blackout_timer, &err);
+      timerStarted = 1;
+    }
     // Post to lcd semaphore
     OSSemPost(&lcd_semaphore,
               OS_OPT_POST_ALL + OS_OPT_POST_NO_SCHED,
@@ -710,28 +715,14 @@ static void endgame_task(void *arg)
 //    OSSemSet(&lcd_semaphore,
 //             0,
 //             &err); //We don't want to update the LCD anymore
-
+    update_led_control_struct(&led1_data, 20, 16);
+    update_led_control_struct(&led0_data, 20, 0);
     switch(flag){
       case endgame_flag_crashed:
           displayEndgameScreen(&glib_context, "Crashed!");
-//          GLIB_drawStringOnLine(&glib_context,
-//                                "Crashed!",
-//                                0,
-//                                GLIB_ALIGN_CENTER,
-//                                5,
-//                                5,
-//                                true);
-
         break;
       case endgame_flag_landed:
           displayEndgameScreen(&glib_context, "Landed!");
-//        GLIB_drawStringOnLine(&glib_context,
-//                              "Crashed!",
-//                              1,
-//                              GLIB_ALIGN_CENTER,
-//                              5,
-//                              5,
-//                              true);
         break;
     }
   }
@@ -955,6 +946,11 @@ static void lcd_display_task(void *arg)
                   &err);
 
 
+        OSMutexPend(&thrust_mutex,
+                    0,
+                    OS_OPT_PEND_BLOCKING,
+                    (CPU_TS*)0,
+                    &err);
         OSMutexPend(&direction_mutex,
                     0,
                     OS_OPT_PEND_BLOCKING,
@@ -968,13 +964,16 @@ static void lcd_display_task(void *arg)
         GLIB_clear(&glib_context);
         DMD_DisplayGeometry* geometry;
         DMD_getDisplayGeometry(&geometry);
-        displayShipPolygon(&glib_context, &position_data, &direction_data, &settings_data);
+        displayShipPolygon(&glib_context, &position_data, &direction_data, &thrust_data, &settings_data);
         DMD_updateDisplay();
 
         OSMutexPost(&position_mutex,
                     OS_OPT_POST_NO_SCHED,
                     &err);
         OSMutexPost(&direction_mutex,
+                    OS_OPT_POST_NO_SCHED,
+                    &err);
+        OSMutexPost(&thrust_mutex,
                     OS_OPT_POST_NO_SCHED,
                     &err);
 
@@ -1140,6 +1139,7 @@ static void blackout_timer_callback(OS_TMR *p_tmr, void *p_arg){
               OS_OPT_PEND_BLOCKING,
               (CPU_TS*)0,
               &err);
+  timerStarted = 0;
   thrust_data.blacked_out = 0;
   OSMutexPost(&thrust_mutex,
               OS_OPT_POST_NONE,
