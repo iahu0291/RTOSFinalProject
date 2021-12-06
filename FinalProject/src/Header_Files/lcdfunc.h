@@ -20,7 +20,7 @@ unsigned int translatePosition(struct craft_position_struct *position, struct ga
 
 unsigned int translateDirection(struct craft_direction_struct *direction, struct game_settings_struct *settings);
 
-void displayShipPolygon(GLIB_Context_t* context, struct craft_position_struct *position, struct craft_direction_struct *direction, struct game_settings_struct *settings);
+void displayShipPolygon(GLIB_Context_t* context, struct craft_position_struct *position, struct craft_direction_struct *direction, struct craft_thrust_struct *thrust, struct game_settings_struct *settings);
 
 unsigned int move_point_along_angle(int angle, int xStart, int yStart, int distance);
 
