@@ -16,6 +16,7 @@ C_DEPS :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
+SystemView \
 autogen \
 gecko_sdk_3.2.2/hardware/board/src \
 gecko_sdk_3.2.2/hardware/driver/memlcd/src/memlcd_usart \

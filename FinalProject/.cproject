@@ -178,6 +178,14 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/FinalProject/src/Source_Files}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/FinalProject/src/Header_Files}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;C:\SiliconLabs\SimplicityStudio\v5\developer\sdks\gecko_sdk_suite\v3.2\util\third_party\segger\systemview\Config&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;C:\SiliconLabs\SimplicityStudio\v5\developer\sdks\gecko_sdk_suite\v3.2\util\third_party\segger\systemview\SEGGER&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;C:\SiliconLabs\SimplicityStudio\v5\developer\sdks\gecko_sdk_suite\v3.2\util\third_party\segger\systemview\Sample\MicriumOSKernel&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;C:\SiliconLabs\SimplicityStudio\v5\developer\sdks\gecko_sdk_suite\v3.2\util\third_party\segger\systemview\Sample\MicriumOSKernel\Config&quot;"/>
                                     								
                                 </option>
                                 								
@@ -314,6 +322,14 @@
                                     <listOptionValue builtIn="false" value="&quot;${StudioSdkPath}/platform/service/sleeptimer/inc&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${StudioSdkPath}/platform/service/udelay/inc&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;C:\SiliconLabs\SimplicityStudio\v5\developer\sdks\gecko_sdk_suite\v3.2\util\third_party\segger\systemview\SEGGER&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;C:\SiliconLabs\SimplicityStudio\v5\developer\sdks\gecko_sdk_suite\v3.2\util\third_party\segger\systemview\Sample\MicriumOSKernel&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;C:\SiliconLabs\SimplicityStudio\v5\developer\sdks\gecko_sdk_suite\v3.2\util\third_party\segger\systemview\Sample\MicriumOSKernel\Config&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;C:\SiliconLabs\SimplicityStudio\v5\developer\sdks\gecko_sdk_suite\v3.2\util\third_party\segger\systemview\Config&quot;"/>
                                     								
                                 </option>
                                 								
