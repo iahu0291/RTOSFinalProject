@@ -10,3 +10,7 @@ FinalProject/GNU ARM v10.2.1 - Default/FinalProject.hex
 FinalProject/GNU ARM v10.2.1 - Default/FinalProject.bin
 FinalProject/GNU ARM v10.2.1 - Default/FinalProject.bin
 FinalProject/GNU ARM v10.2.1 - Default/FinalProject.hex
+*.o
+*.d
+*.o
+FinalProject/GNU ARM v10.2.1 - Default/autogen/sl_board_default_init.d
