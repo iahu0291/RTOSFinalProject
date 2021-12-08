@@ -166,7 +166,7 @@ unsigned int get_led_ctrls(struct craft_thrust_struct *thrust_data, struct game_
   led0_period = 4;
   if((thrust_data->blacked_out)){
       led1_dutyCycle  = 16;
-      led1_period = 10;
+      led1_period = 2;
   }
   else{
       int thrustNum = ((thrust_data->current_thrust * settings->maxThrust)/2);

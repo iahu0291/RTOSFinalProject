@@ -135,7 +135,7 @@ void tasks_init(void)
 
   // Define game settings
   settings_data.blackoutAccel = 12; // m/s^2
-  settings_data.blackoutDuration = 30; //20ths of a second
+  settings_data.blackoutDuration = 20; //20ths of a second
   settings_data.gravity = 2; // m/s^2
   settings_data.vehicleMass = 2048; //kg
   settings_data.maxThrust = 32768; //N, will accelerate the ship at 8m/s^2 when full of fuel; alt 131072, for 32m/s^2
@@ -170,7 +170,7 @@ void tasks_init(void)
 
   //Position data
   position_data.current_x_position = settings_data.xMax / 2;
-  position_data.current_y_position = settings_data.yMax / 2;
+  position_data.current_y_position = (settings_data.yMax * 9) / 10;
   position_data.current_x_vel = 0;
   position_data.current_y_vel = 0;
 

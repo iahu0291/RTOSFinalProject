@@ -37,48 +37,50 @@ void displayShipPolygon(GLIB_Context_t* context, struct craft_position_struct *p
   GLIB_drawPolygonFilled(context, 3, &polygonPoints);
   int thrusterPointsPort[6], thrusterPointsStarboard[6];
   unsigned int ship_port_thrust_ctrpoint, ship_starboard_thrust_ctrpoint, ship_port_thrust_outpoint, ship_starboard_thrust_outpoint;
-  switch(thrust->current_thrust){
-    case thrust_min:
-      thrusterPointsPort[0] = xPos;
-      thrusterPointsPort[1] = yPos;
-      thrusterPointsPort[2] = polygonPoints[2];
-      thrusterPointsPort[3] = polygonPoints[3];
-      thrusterPointsStarboard[0] = xPos;
-      thrusterPointsStarboard[1] = yPos;
-      thrusterPointsStarboard[2] = polygonPoints[4];
-      thrusterPointsStarboard[3] = polygonPoints[5];
-      ship_port_thrust_ctrpoint = move_point_along_angle((directionVal + 8) % 32, xPos, yPos, 4);
-      ship_starboard_thrust_ctrpoint = move_point_along_angle((directionVal + 24) % 32, xPos, yPos, 4);
-      ship_port_thrust_outpoint = move_point_along_angle((directionVal + 16) % 32, (ship_port_thrust_ctrpoint & LCD_XPOS_MASK) >> 16, (ship_port_thrust_ctrpoint & LCD_YPOS_MASK), 4);
-      ship_starboard_thrust_outpoint = move_point_along_angle((directionVal + 16) % 32, (ship_starboard_thrust_ctrpoint & LCD_XPOS_MASK) >> 16, (ship_starboard_thrust_ctrpoint & LCD_YPOS_MASK), 4);
-      thrusterPointsPort[4] = (ship_port_thrust_outpoint & LCD_XPOS_MASK) >> 16;
-      thrusterPointsPort[5] = (ship_port_thrust_outpoint & LCD_YPOS_MASK);
-      thrusterPointsStarboard[4] = (ship_starboard_thrust_outpoint & LCD_XPOS_MASK) >> 16;
-      thrusterPointsStarboard[5] = (ship_starboard_thrust_outpoint & LCD_YPOS_MASK);
-      GLIB_drawPolygon(context, 3, &thrusterPointsStarboard);
-      GLIB_drawPolygon(context, 3, &thrusterPointsPort);
-      break;
-    case thrust_max:
-      thrusterPointsPort[0] = xPos;
-      thrusterPointsPort[1] = yPos;
-      thrusterPointsPort[2] = polygonPoints[2];
-      thrusterPointsPort[3] = polygonPoints[3];
-      thrusterPointsStarboard[0] = xPos;
-      thrusterPointsStarboard[1] = yPos;
-      thrusterPointsStarboard[2] = polygonPoints[4];
-      thrusterPointsStarboard[3] = polygonPoints[5];
-      ship_port_thrust_ctrpoint = move_point_along_angle((directionVal + 8) % 32, xPos, yPos, 4);
-      ship_starboard_thrust_ctrpoint = move_point_along_angle((directionVal + 24) % 32, xPos, yPos, 4);
-      ship_port_thrust_outpoint = move_point_along_angle((directionVal + 16) % 32, (ship_port_thrust_ctrpoint & LCD_XPOS_MASK) >> 16, (ship_port_thrust_ctrpoint & LCD_YPOS_MASK), 8);
-      ship_starboard_thrust_outpoint = move_point_along_angle((directionVal + 16) % 32, (ship_starboard_thrust_ctrpoint & LCD_XPOS_MASK) >> 16, (ship_starboard_thrust_ctrpoint & LCD_YPOS_MASK), 8);
-      thrusterPointsPort[4] = (ship_port_thrust_outpoint & LCD_XPOS_MASK) >> 16;
-      thrusterPointsPort[5] = (ship_port_thrust_outpoint & LCD_YPOS_MASK);
-      thrusterPointsStarboard[4] = (ship_starboard_thrust_outpoint & LCD_XPOS_MASK) >> 16;
-      thrusterPointsStarboard[5] = (ship_starboard_thrust_outpoint & LCD_YPOS_MASK);
-      GLIB_drawPolygon(context, 3, &thrusterPointsStarboard);
-      GLIB_drawPolygon(context, 3, &thrusterPointsPort);
-      break;
-    default: break;
+  if(!thrust->blacked_out){
+      switch(thrust->current_thrust){
+        case thrust_min:
+          thrusterPointsPort[0] = xPos;
+          thrusterPointsPort[1] = yPos;
+          thrusterPointsPort[2] = polygonPoints[2];
+          thrusterPointsPort[3] = polygonPoints[3];
+          thrusterPointsStarboard[0] = xPos;
+          thrusterPointsStarboard[1] = yPos;
+          thrusterPointsStarboard[2] = polygonPoints[4];
+          thrusterPointsStarboard[3] = polygonPoints[5];
+          ship_port_thrust_ctrpoint = move_point_along_angle((directionVal + 8) % 32, xPos, yPos, 4);
+          ship_starboard_thrust_ctrpoint = move_point_along_angle((directionVal + 24) % 32, xPos, yPos, 4);
+          ship_port_thrust_outpoint = move_point_along_angle((directionVal + 16) % 32, (ship_port_thrust_ctrpoint & LCD_XPOS_MASK) >> 16, (ship_port_thrust_ctrpoint & LCD_YPOS_MASK), 4);
+          ship_starboard_thrust_outpoint = move_point_along_angle((directionVal + 16) % 32, (ship_starboard_thrust_ctrpoint & LCD_XPOS_MASK) >> 16, (ship_starboard_thrust_ctrpoint & LCD_YPOS_MASK), 4);
+          thrusterPointsPort[4] = (ship_port_thrust_outpoint & LCD_XPOS_MASK) >> 16;
+          thrusterPointsPort[5] = (ship_port_thrust_outpoint & LCD_YPOS_MASK);
+          thrusterPointsStarboard[4] = (ship_starboard_thrust_outpoint & LCD_XPOS_MASK) >> 16;
+          thrusterPointsStarboard[5] = (ship_starboard_thrust_outpoint & LCD_YPOS_MASK);
+          GLIB_drawPolygon(context, 3, &thrusterPointsStarboard);
+          GLIB_drawPolygon(context, 3, &thrusterPointsPort);
+          break;
+        case thrust_max:
+          thrusterPointsPort[0] = xPos;
+          thrusterPointsPort[1] = yPos;
+          thrusterPointsPort[2] = polygonPoints[2];
+          thrusterPointsPort[3] = polygonPoints[3];
+          thrusterPointsStarboard[0] = xPos;
+          thrusterPointsStarboard[1] = yPos;
+          thrusterPointsStarboard[2] = polygonPoints[4];
+          thrusterPointsStarboard[3] = polygonPoints[5];
+          ship_port_thrust_ctrpoint = move_point_along_angle((directionVal + 8) % 32, xPos, yPos, 4);
+          ship_starboard_thrust_ctrpoint = move_point_along_angle((directionVal + 24) % 32, xPos, yPos, 4);
+          ship_port_thrust_outpoint = move_point_along_angle((directionVal + 16) % 32, (ship_port_thrust_ctrpoint & LCD_XPOS_MASK) >> 16, (ship_port_thrust_ctrpoint & LCD_YPOS_MASK), 8);
+          ship_starboard_thrust_outpoint = move_point_along_angle((directionVal + 16) % 32, (ship_starboard_thrust_ctrpoint & LCD_XPOS_MASK) >> 16, (ship_starboard_thrust_ctrpoint & LCD_YPOS_MASK), 8);
+          thrusterPointsPort[4] = (ship_port_thrust_outpoint & LCD_XPOS_MASK) >> 16;
+          thrusterPointsPort[5] = (ship_port_thrust_outpoint & LCD_YPOS_MASK);
+          thrusterPointsStarboard[4] = (ship_starboard_thrust_outpoint & LCD_XPOS_MASK) >> 16;
+          thrusterPointsStarboard[5] = (ship_starboard_thrust_outpoint & LCD_YPOS_MASK);
+          GLIB_drawPolygon(context, 3, &thrusterPointsStarboard);
+          GLIB_drawPolygon(context, 3, &thrusterPointsPort);
+          break;
+        default: break;
+      }
   }
 }
 
